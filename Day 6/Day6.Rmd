@@ -1,0 +1,48 @@
+---
+title: "Day 6 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+options(scipen = 999)
+```
+
+```{r}
+input<-read_lines("Day6Sample.txt")
+```
+
+## Part 1
+
+Put input in a dataframe (because why not?)
+```{r}
+messageframe<-as.data.frame(matrix(ncol=6,nrow=0))
+for(i in 1:length(input)){
+  messageframe<-rbind(messageframe,x<-unlist(str_split(input[i],"")))}
+  
+```
+
+Find the most common character in each column
+
+```{r}
+part1<-c()
+for (i in 1:ncol(messageframe)){
+  part1<-c(part1,names(sort(table(messageframe[,i]),decreasing=TRUE)[1]))}
+part1<-str_flatten(part1)
+part1
+```
+
+## Part 2
+Just grab the least frequent (instead of the most frequent)
+
+```{r}
+part2<-c()
+for (i in 1:ncol(messageframe)){
+  part2<-c(part2,names(sort(table(messageframe[,i]))[1]))}
+part2<-str_flatten(part2)
+part2
+```

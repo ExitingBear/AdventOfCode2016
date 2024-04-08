@@ -1,0 +1,115 @@
+---
+title: "Day 7 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+options(scipen = 999)
+```
+
+##Part 1
+
+```{r}
+input<-read_lines("Day7Sample.txt")
+```
+
+Not the best idea, but going through character by character will work.
+
+```{r}
+tlssupport<-function(ip){
+  answer<-NA
+  inside<-0
+  i<-1
+  while((is.na(answer)||answer==TRUE)&&i<=(nchar(ip)-3)){
+    x<-str_sub(ip,i,i)
+    if(x=="["){
+      ### mark this as going inside the brackets
+      inside<-inside+1
+      i<-i+1
+      next}else if(x=="]"){
+        ### leave at least one set brackets - if nested brackets, still inside
+        inside<-inside-1
+        i<-i+1
+        next
+        ### if it isn't equal to the other A or is equal to the first B, move on
+      }else if(x!=str_sub(ip,i+3,i+3)||x==str_sub(ip,i+1,i+1)){
+        i<-i+1
+        next
+        ### check if the Bs match
+      }else if(str_sub(ip,i+1,i+1)!=str_sub(ip,i+2,i+2)){
+        i<-i+1
+        next
+      }else if(inside>0){
+        answer<-FALSE
+        next
+      }else{answer<-TRUE
+      i<-i+4}
+    ###inside while
+  }
+  ###outside while
+  if(is.na(answer)||answer=="FALSE"){"no"}else{"yes"}}
+
+```
+
+
+```{r}
+part1<-sapply(input,function(x){tlssupport(x)})
+part1<-length(which(part1=="yes"))
+part1
+```
+## Part 2
+
+
+Under "things that should work, but are slow"
+1. Find all ABAs that are outside (much like the previous) and all BABs that are inside
+2. Check for matches.
+
+```{r}
+
+sslsupport<-function(ip){
+  inside<-0
+  i<-1
+  ABA<-c()
+  BAB<-c()
+  ### first, find ABAs or BABs
+  while(i<=(nchar(ip)-2)){
+    x<-str_sub(ip,i,i)
+    if(x=="["){
+      ### mark this as going inside the brackets
+      inside<-inside+1
+    }else if(x=="]"){
+      ### leave at least one set brackets - if nested brackets, still inside
+      inside<-inside-1
+      ### if it isn't equal to the other A or is equal to the first B, move on
+    }else if(x!=str_sub(ip,i+2,i+2)||x==str_sub(ip,i+1,i+1)){
+      ### you have an ABA or a BAB
+    }else if(inside>0){
+      BAB<-c(BAB,str_sub(ip,i,i+2))
+    }else{
+      ABA<-c(ABA,str_sub(ip,i,i+2))}
+    i<-i+1}
+  ###if either list is 0, return "no"
+  if(length(ABA)==0||length(BAB)==0){return("no")}
+  for(o in 1:length(ABA)){
+    for(i in 1:length(BAB)){
+      if(str_sub(ABA[o],1,1)==str_sub(BAB[i],2,2)&&str_sub(ABA[o],2,2)==str_sub(BAB[i],1,1)){
+        return("yes")}}}
+  "no"}
+
+
+
+
+```
+
+```{r}
+part2<-sapply(input,function(x){sslsupport(x)})
+part2<-length(which(part2=="yes"))
+part2
+
+```
+

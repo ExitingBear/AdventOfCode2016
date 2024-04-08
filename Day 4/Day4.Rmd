@@ -1,0 +1,94 @@
+---
+title: "Day XX Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+options(scipen = 999)
+```
+
+## Part 1
+```{r}
+input<-read_lines("Day4Sample.txt")
+```
+
+In the most convoluted way possible - 
+Split out the string into encryptedname, id, checksum
+split the encrypted name into individual pieces
+use table to tally (and sort) in descending order
+grab the first 5 (which will be alphabetical order, because table does that)
+compare to the checksum
+
+```{r}
+realroom<-function(rm){
+  chksum<-str_sub(rm,-6,-2)
+  encrnm<-unlist(str_split(str_sub(rm,end=-8),"-"))
+  id<-as.numeric(tail(encrnm,1))
+  encrnm<-encrnm[-length(encrnm)]
+  encrnm<-unlist(str_split(str_flatten(encrnm),""))
+  chkagainst<-table(encrnm)
+  chkagainst<-chkagainst[order(chkagainst,decreasing=TRUE)]
+  chkagainst<-str_flatten(names(chkagainst[1:5]))
+  if(chksum==chkagainst){unname(id)}else{0}}
+```
+
+
+```{r}
+part1<-sapply(input,function(x) realroom(x))
+part1
+```
+## Part 2
+do the function that allows cipher shift - 
+
+```{r}
+shiftit<-function(str,id){
+  answer<-""
+  for(i in 1:nchar(str)){
+    x<-str_sub(str,i,i)
+    if(x=="-"){answer<-paste0(answer," ")
+    }else{
+      x<-(which(x==letters)+id)%%26
+      if(x==0){x<-26}
+      y<-letters[x]
+      answer<-paste0(answer,y)}}
+answer}
+```
+
+apply it to the input:
+```{r}
+part2<-as.data.frame(matrix(ncol=1,nrow=0))
+for(i in 1:length(input)){
+  part2<-rbind(part2,c(input[i]))}
+colnames(part2)<-c("room")
+
+
+
+part2<-part2 %>% rowwise %>%
+  ### get ids
+  mutate(ids=realroom(room)) %>%
+  ### filter out decoy rooms
+  filter(ids!=0) %>%
+  ### get the room names
+  mutate(roomonly=str_replace(str_sub(room,end=-8),paste0("-",ids),"")) %>%
+  ### decrypt them
+  mutate(decrypt=shiftit(roomonly,ids))
+```
+The room names are fun - but so as to not use real input, I'm going to not show them. This line does, though
+
+```{r}
+part2$decrypt
+```
+
+for real input, search for north.  For this fake, search for "very" just to show how it works
+```{r}
+part2<-part2$ids[which(str_detect(part2$decrypt,"very"))]
+### for real input search for "north"
+#part2<-part2$ids[which(str_detect(part2$decrypt,"north"))]
+part2
+```
+

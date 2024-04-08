@@ -1,0 +1,61 @@
+---
+title: "Day 3 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(ggplot2)
+library(readr)
+options(scipen = 999)
+```
+
+##Part 1
+
+```{r}
+input<-read_lines("Day3Sample.txt")
+```
+
+first, create a quick function to tell if three lengths make a valid triangle
+```{r}
+isittri<-function(a,b,c){
+  if(a+b>c&&b+c>a&&a+c>b){TRUE}else{FALSE}}
+```
+
+Then, for part 1, translate the input into a df
+
+```{r}
+part1df<-as.data.frame(matrix(nrow=0,ncol=3))
+for(i in 1:length(input)){
+  part1df<-rbind(part1df,as.numeric(unlist(str_split(str_squish(input[i])," "))))}
+colnames(part1df)<-c("a","b","c")
+```
+Then run tri() on it.
+```{r}
+part1df<-part1df %>% rowwise %>%
+  mutate(t=isittri(a,b,c))%>%
+  filter(t==TRUE)
+part1<-nrow(part1df)
+part1
+
+```
+
+## Part 2
+For part 2, put this (temporarily) into a df, then to a big long vector.
+```{r}
+p2<-part1df<-as.data.frame(matrix(nrow=0,ncol=3))
+for(i in 1:length(input)){
+  p2<-rbind(p2,as.numeric(unlist(str_split(str_squish(input[i])," "))))}
+p2<-c(p2[,1],p2[,2],p2[,3])
+```
+then run down the list
+```{r}
+part2<-sapply(seq(from=1,to=length(p2),by=3),function(x){
+  isittri(p2[x],p2[x+1],p2[x+2])})
+part2<-length(which(part2==TRUE))
+part2
+```
+
