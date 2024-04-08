@@ -1,0 +1,93 @@
+---
+title: "Day 2 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(igraph)
+library(ggplot2)
+library(rgl)
+library(ggraph)
+library(readr)
+library(ds4psy)
+library(numbers)
+options(scipen = 999)
+```
+
+## Part 1
+
+Knowing what's coming in part 2 - going to explicitly create a matrix with a border of NA around the edge. The basic pattern will be check the place to move, if it's not NA, move there, otherwise, wait. 
+
+
+```{r}
+input<-read_lines("Day2Sample.txt")
+
+keypad<-matrix(c(c(NA,NA,NA,NA,NA),
+                     c(NA,1,2,3,NA),
+                     c(NA,4,5,6,NA),
+                     c(NA,7,8,9,NA),
+                     c(NA,NA,NA,NA,NA)),nrow=5,ncol=5,byrow=TRUE)
+```
+
+Two functions - one for a single button press:
+
+
+```{r}
+buttonpress<-function(strt,kp,pth){
+  pos<-strt
+  pth<-unlist(str_split(pth,""))
+  while(length(pth>0)){
+    nxt<-switch(pth[1],
+                "U"=pos+c(0,-1),
+                "D"=pos+c(0,1),
+                "L"=pos+c(-1,0),
+                "R"=pos+c(1,0),
+                cat("something went wrong\n"))
+    if(!is.na(kp[nxt[2],nxt[1]])){pos<-nxt}
+    pth<-pth[-1]}
+list(kp[pos[2],pos[1]],pos)}
+```
+
+and one for the full chain
+
+```{r}
+allbuttons<-function(strt,kp,pthlist){
+  pos<-strt
+  fullcode<-c()
+  while(length(pthlist>0)){
+    x<-pthlist[1]
+    y<-buttonpress(pos,kp,x)
+    pos<-unlist(y[[2]])
+    fullcode<-c(fullcode,unlist(y[[1]]))
+    pthlist<-pthlist[-1]}
+  str_flatten(fullcode)}
+
+```
+
+
+
+```{r}
+part1<-allbuttons(c(3,3),keypad,input)
+part1
+```
+## Part 2
+Just need a new keypad, but everything should be the same
+
+```{r}
+keypad2<-matrix(c(c(NA,NA,NA,NA,NA,NA,NA),
+                     c(NA,NA,NA,1,NA,NA,NA),
+                     c(NA,NA,2,3,4,NA,NA),
+                     c(NA,5,6,7,8,9,NA),
+                     c(NA,NA,"A","B","C",NA,NA),
+                     c(NA,NA,NA,"D",NA,NA,NA),
+                     c(NA,NA,NA,NA,NA,NA,NA)),nrow=7,ncol=7,byrow=TRUE)
+```
+
+```{r}
+part2<-allbuttons(c(2,4),keypad2,input)
+part2
+```

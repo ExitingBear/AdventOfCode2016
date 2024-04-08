@@ -1,0 +1,99 @@
+---
+title: "Day 01 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(ggplot2)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+##Part 1
+
+```{r}
+input<-read_lines("Day1Sample.txt")
+```
+
+
+```{r}
+endposition<-function(pth=input){
+  pos<-c(0,0)
+  facing<-"N"
+  stps<-unlist(str_split(pth,", "))
+  i<-1
+  while(i<=length(stps)){
+    x<-stps[i]
+    turn<-str_sub(x,1,1)
+    dist<-as.numeric(str_sub(x,2))
+    ###change direction
+    switch(facing,
+           "N"=if(turn=="L"){facing<-"W"}else{facing<-"E"},
+           "E"=if(turn=="L"){facing<-"N"}else{facing<-"S"},
+           "S"=if(turn=="L"){facing<-"E"}else{facing<-"W"},
+           "W"=if(turn=="L"){facing<-"S"}else{facing<-"N"},
+           cat("something went wrong\n"))
+    ###move forward
+    switch(facing,
+           "N"=pos<-pos+c(0,+dist),
+           "E"=pos<-pos+c(dist,0),
+           "S"=pos<-pos+c(0,-dist),
+           "W"=pos<-pos+c(-dist,0),
+           cat("something went wrong\n"))
+    ###repeat
+    i<-i+1}
+  abs(pos[1])+abs(pos[2])}
+```
+
+```{r}
+part1<-sapply(input,function(x) endposition(x))
+part1
+```
+## Part 2
+Need to keep track of where there's been a step, then return the cross:
+
+```{r}
+crosspoint<-function(pth=input){
+  pos<-c(0,0)
+  facing<-"N"
+  stps<-unlist(str_split(pth,", "))
+  i<-1
+  beenthere<-dict()
+  uncrossed<-TRUE
+  while(uncrossed){
+    x<-stps[i]
+    turn<-str_sub(x,1,1)
+    dist<-as.numeric(str_sub(x,2))
+    ###change direction
+    switch(facing,
+           "N"=if(turn=="L"){facing<-"W"}else{facing<-"E"},
+           "E"=if(turn=="L"){facing<-"N"}else{facing<-"S"},
+           "S"=if(turn=="L"){facing<-"E"}else{facing<-"W"},
+           "W"=if(turn=="L"){facing<-"S"}else{facing<-"N"},
+           cat("something went wrong\n"))
+    ###move forward
+    for(s in 1:dist){
+      switch(facing,
+             "N"=pos<-pos+c(0,1),
+             "E"=pos<-pos+c(1,0),
+             "S"=pos<-pos+c(0,-1),
+             "W"=pos<-pos+c(-1,0),
+             cat("something went wrong\n"))
+      if(beenthere$has(pos)){
+        uncrossed<-FALSE
+        break}else(beenthere$set(pos,pos))}
+    ###repeat
+    i<-i+1}
+  abs(pos[1])+abs(pos[2])}
+```
+
+```{r}
+part2<-crosspoint(input[4])
+part2
+```
+

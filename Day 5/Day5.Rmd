@@ -1,0 +1,64 @@
+---
+title: "Day 5 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(ggraph)
+library(readr)
+library(digest)
+options(scipen = 999)
+```
+
+## Part 1
+I really have no idea how to do this other than brute force
+
+```{r}
+input<-"abc"
+```
+
+
+```{r}
+part1<-c()
+attempt<-0
+## start with 0 and an empty vector.  When the vector is 8 characters long, stop
+while(length(part1)<8){
+  x<-digest::digest(str_c(input,attempt),algo="md5",serialize=FALSE)
+  ### if the first 5 characters are "00000", get the sixth and append it to the vector
+  if(str_sub(x,1,5)=="00000"){
+    part1<-c(part1,str_sub(x,6,6))}
+  attempt<-attempt+1}
+part1<-str_flatten(part1)
+part1
+```
+## Part 2
+
+Just keep running and running and running
+
+```{r}
+##set up the vector
+part2<-rep(NA,8)
+attempt<-0
+## while not all the parts are filled, 
+while(any(is.na(part2))){
+  x<-digest::digest(str_c(input,attempt),algo="md5",serialize=FALSE)
+  ### if the first 5 characters are "00000" then
+  if(str_sub(x,1,5)=="00000"){
+    y<-str_sub(x,6,6)
+    ### if the sixth character is betwen 0 & 8 then
+    if(y %in% c("0","1","2","3","4","5","6","7")){
+      y<-as.numeric(y)
+      ### if that slot (+1) is not already filled, fill it with the 7th character
+      if(is.na(part2[y+1])){
+        part2[y+1]<-str_sub(x,7,7)}}}
+  attempt<-attempt+1}
+
+cat("\n")
+part2<-str_flatten(part2)
+part2
+```
+For my actual data, part 2 took 27MILLION to reach the end
