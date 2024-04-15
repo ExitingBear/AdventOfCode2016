@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 17 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,124 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
 library(ds4psy)
 library(numbers)
+library(digest)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+```{r}
+testcodes<-c("ihgpwlah","kglvqrro","ulqzkmiv")
+```
+
+
+```{r}
+vaultpath<-function(passcode){
+  d<-dict()
+  pq<-priority_queue()
+  st<-list(1,1,passcode,0)
+  pq$push(st,priority=6)
+  while(pq$size()>0){
+    ### pop
+    curr<-pq$pop()
+    ### if out of bounds, out
+    if(curr[[1]]<1||curr[[1]]>4||curr[[2]]<1||curr[[2]]>4){next}
+    ### if at end out
+    if(curr[[1]]==4&&curr[[2]]==4){
+      return(curr)}
+    ### if been there out
+    if(d$has(c(curr[[1]],curr[[2]],curr[[3]]))){next}
+    d$set(c(curr[[1]],curr[[2]],curr[[3]]),curr[[3]])
+    ### find the hash
+    kees<-unlist(str_split(str_sub(digest::digest(curr[[3]],algo="md5",serialize=FALSE),1,4),""))
+    ### if can go up
+    if(kees[1]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]],curr[[2]]-1,str_c(curr[[3]],"U"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,-pri)}
+    ### if can go down
+    if(kees[2]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]],curr[[2]]+1,str_c(curr[[3]],"D"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,-pri)}
+    ### if can go left
+    if(kees[3]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]]-1,curr[[2]],str_c(curr[[3]],"L"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,-pri)}
+    ### if can go right
+    if(kees[4]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]]+1,curr[[2]],str_c(curr[[3]],"R"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,-pri)}}
+  d}
+```
+
+
+
+
+```{r}
+part1<-sapply(testcodes,function(x){
+  y<-vaultpath(x)
+  y<-str_sub(y[[3]],start=nchar(x)+1)
+  y})
+part1
+```
+## Part 2
+Find the longest path
+```{r}
+longpath<-function(passcode){
+  d<-dict()
+  pq<-priority_queue()
+  st<-list(1,1,passcode,0)
+  pq$push(st,priority=6)
+  counter<-0
+  lp<-0
+  while(pq$size()>0){
+    ### pop
+    curr<-pq$pop()
+    ### if out of bounds, out
+    if(curr[[1]]<1||curr[[1]]>4||curr[[2]]<1||curr[[2]]>4){next}
+    ### if at end, then compare to the current longest path - keep the longer
+    if(curr[[1]]==4&&curr[[2]]==4){
+      lp<-max(lp,curr[[4]])
+      next}
+    ### if been there out
+    if(d$has(c(curr[[1]],curr[[2]],curr[[3]]))){next}
+    d$set(c(curr[[1]],curr[[2]],curr[[3]]),curr[[3]])
+    ### find the hash
+    kees<-unlist(str_split(str_sub(digest::digest(curr[[3]],algo="md5",serialize=FALSE),1,4),""))
+    ### if can go up
+    if(kees[1]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]],curr[[2]]-1,str_c(curr[[3]],"U"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,pri)
+    }
+    ### if can go down
+    if(kees[2]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]],curr[[2]]+1,str_c(curr[[3]],"D"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,pri)
+    }
+    ### if can go left
+    if(kees[3]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]]-1,curr[[2]],str_c(curr[[3]],"L"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,pri)
+      }
+    ### if can go right
+    if(kees[4]%in%c("b","c","d","e","f")){
+      nxt<-list(curr[[1]]+1,curr[[2]],str_c(curr[[3]],"R"),curr[[4]]+1)
+      pri<-curr[[4]]+sum(abs(c(4,4)-c(nxt[[1]],nxt[[2]])))
+      pq$push(nxt,pri)
+    }
+    counter<-counter+1}
+lp}
+```
+
+```{r}
+sapply(testcodes,longpath)
 ```
 

@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 9 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,76 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+```{r}
+input<-read_lines("Day9Sample.txt")
 ```
 
+
+## Part 1
+
+Quick function that takes in a short string and lengthens it
+```{r}
+longer<-function(shrt){
+  lng<-c()
+  shrtlength<-nchar(shrt)
+  i<-1
+  while(i<=shrtlength){
+    if(str_sub(shrt,i,i)!="("){
+      lng<-c(lng,str_sub(shrt,i,i))
+      i<-i+1
+    }else{
+      i<-i+1
+      marker<-""
+      while(str_sub(shrt,i,i)!=")"){
+        marker<-paste0(marker,str_sub(shrt,i,i))
+        i<-i+1}
+      i<-i+1
+      marker<-as.numeric(unlist(str_split(marker,"x")))
+      rstr<-str_sub(shrt,i,(i+marker[1]-1))
+      lng<-c(lng,rep(rstr,marker[2]))
+      i<-i+marker[1]}
+  }
+lng<-str_flatten(lng)
+lng}
+```
+
+```{r}
+
+p1<-sapply(input,function(x){longer(x)})
+part1<-sum(nchar(p1))
+p1
+part1
+```
+## Part 2
+It is implying heavily that I can't just keep decompressing stuff - so, recursion it is:
+
+```{r}
+howlong<-function(s){
+  ### if there aren't any markers, how long is the length of the string
+  if(str_detect(s,"\\(")==FALSE){return(nchar(s))
+    ### if the first character isn't a marker, then it's that number of characters + howlong(everything after the marker) 
+  }else if(str_sub(s,1,1)!="("){
+    (str_locate(s,"\\(")[1]-1) + howlong(str_sub(s,str_locate(s,"\\(")[1]))
+    ### if the first character is a marker
+  }else{
+    ### get the marker
+    marker<-as.numeric(unlist(str_split(str_sub(s,2,str_locate(s,"\\)")[1]-1),"x")))
+    ### get the string
+    s<-str_sub(s,str_locate(s,"\\)")[1]+1)
+    ### split the string in two - the part to be repeated & everything else
+    repst<-str_sub(s,end=marker[1])
+    remst<-str_sub(s,start=marker[1]+1)
+    ## multiply howlong(the part encompassed by the marker)* the number of repeats + howlong(thepart not covered by the marker)
+    return((marker[2]*howlong(repst))+(howlong(remst)))}}
+```
+
+
+
+```{r}
+part2<-sapply(input,function(x){howlong(x)})
+part2
+```

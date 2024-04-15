@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 14 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,99 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
+library(digest)
 library(numbers)
+library(memoise)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+
+## Part 1
+This is just plain brute force - check every number until it there are 64.  Keep going for a while in case there's another number that simply hasn't registered yet.
+
+```{r}
+findkeys<-function(starter){
+  keydf<-as.data.frame(matrix(nrow=0,ncol=4))
+  colnames(keydf)<-c("key","index","ch","matchid")
+  found<-0
+  i<-0
+  stopalready<-1000
+  while(i<stopalready){
+    mdfive<-digest::digest(str_c(starter,i),algo="md5",serialize=FALSE)
+    ### if there are five in a row, check and mark anything in the past 1000 as a key.
+    if(str_detect(mdfive,"([0-9a-z])\\1\\1\\1\\1")){
+      x<-str_locate(mdfive,"([0-9a-z])\\1\\1\\1\\1")[1]
+      x<-str_sub(mdfive,x,x)
+      if(any(keydf$ch==x)){
+        rws<-which(keydf$ch==x)
+        keydf[rws,]<-keydf[rws,] %>%rowwise%>%
+          mutate(matchid=ifelse(index>=(i-1000)&&matchid==-1,i,matchid))
+        ### count how many keys have been found
+        found<-length(which(keydf$matchid>0))}}
+    ### If there are 3 in a row, mark it and where it was found for later.
+    if(str_detect(mdfive,"([0-9a-z])\\1\\1")){
+      x<-str_locate(mdfive,"([0-9a-z])\\1\\1")[1]
+      x<-str_sub(mdfive,x,x+2)
+      keydf<-rbind(keydf,list(key=x,index=i,ch=str_sub(x,1,1),matchid=-1))}
+    ### if there aren't 64 keys, there needs to be at least 1000 more found
+    ### once 64 have been found, then, no more than 1000 need to be checked to see if they might end up finding
+    ### something lower.
+    if(found<=64){stopalready<-i+1000}
+    i<-i+1}
+  keydf}
 ```
 
+
+```{r}
+part1<-findkeys("abc")
+part1<-part1 %>% filter(matchid!=-1) %>% arrange(index)
+part1<-part1$index[64]
+part1
+```
+
+
+## Part 2
+
+The same as the first part, but repeat the hash.  I attempted memoisation - it was worse.  So, for the moment, sticking with just forcing it (slowly) through.
+
+```{r}
+
+
+stretchkeys<-function(starter){
+  keydf<-as.data.frame(matrix(nrow=0,ncol=4))
+  colnames(keydf)<-c("key","index","ch","matchid")
+  found<-0
+  i<-0
+  stopalready<-1000
+  while(i<stopalready){
+     mdfive<-str_c(starter,i)
+    for(m in 1:2017){
+    mdfive<-digest::digest(mdfive,algo="md5",serialize=FALSE)
+    }
+    ### is there a 5
+    if(str_detect(mdfive,"([0-9a-z])\\1\\1\\1\\1")){
+      x<-str_locate(mdfive,"([0-9a-z])\\1\\1\\1\\1")[1]
+      x<-str_sub(mdfive,x,x)
+      if(any(keydf$ch==x)){
+        rws<-which(keydf$ch==x)
+        keydf[rws,]<-keydf[rws,] %>%rowwise%>%
+          mutate(matchid=ifelse(index>=(i-1000)&&matchid==-1,i,matchid))
+        found<-length(which(keydf$matchid>0))}}
+    ### fives can also be threes
+    if(str_detect(mdfive,"([0-9a-z])\\1\\1")){
+      x<-str_locate(mdfive,"([0-9a-z])\\1\\1")[1]
+      x<-str_sub(mdfive,x,x+2)
+      keydf<-rbind(keydf,list(key=x,index=i,ch=str_sub(x,1,1),matchid=-1))}
+    i<-i+1
+    if(found<=64){stopalready<-i+1000}}
+  keydf}
+```
+
+
+```{r}
+p2<-stretchkeys("abc")
+pa2<-p2 %>% filter(matchid!=-1) %>% arrange(index)
+part2<-pa2$index[64]
+part2
+```

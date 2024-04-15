@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 10 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,118 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+```{r}
+input<-read_lines("Day10Sample.txt")
+```
+
+## Part 1
+As with all of these, I'm going to read in line by line over and over and over again until I get an answer - for this one, stop as soon as I have a robot comparing the two values in my data:
+
+
+This adds values for value adding steps and compares chips for the remainder, but stops when it gets the comparison that I'm looking for.
+```{r}
+
+microrunner<-function(instlist){
+  d<-dict()
+  ### as long as there are still instructions
+  while(length(instlist)>0){
+    ### start at the top of the instruction list
+        i<-1
+    while(i<=length(instlist)){
+      ### get an instruction and split it in pieces
+      inst<-instlist[i]
+      inst<-unlist(str_split(inst," "))
+      ### if it is in the form "value X goes to bot Y"
+      if(length(inst)==6){
+        ### add the value to the bot (sort so that the low value is first)
+        adval<-str_flatten(c(inst[5],inst[6])," ")
+        if(d$has(adval)){d$set(adval,sort(c(d$get(adval),as.numeric(inst[2]))))}else{d$set(adval,c(as.numeric(inst[2])))}
+        ### remove that instruction from the instruction list
+        instlist<-instlist[-i]
+        next
+      }else{
+        ### the instruction is of the form: bot X gives low to Y and high to Z
+        ### find bot X
+        fr<-str_flatten(c(inst[1],inst[2])," ")
+        ### if bot X doesn't have two chips, move on to the next instruction
+        if(!d$has(fr)){
+          i<-i+1
+          next
+        }else if(length(d$get(fr))<2){
+          i<-i+1
+          next
+          ### FOR PART 1 ONLY, if bot X has the two chips I'm looking for, return that bot name
+        } else if(all(d$get(fr)==c(17,61))){
+          return(fr)
+          break
+        }else{
+          ### get Y  - if it's empty, add the low chip.
+          ### if it's not empty, add the low chip  to it & sort the order so low chip is first.
+          lo<-str_flatten(c(inst[6],inst[7])," ")
+          if(d$has(lo)){d$set(lo,sort(c(d$get(lo),d$get(fr)[1])))}else{d$set(lo,d$get(fr)[1])}
+          ### get Z - if it's empty, add the high chip.
+          ### if not add the high chip and its chips. 
+          hi<-str_flatten(c(inst[11],inst[12])," ")
+          if(d$has(hi)){d$set(hi,sort(c(d$get(hi),d$get(fr)[2])))}else{d$set(hi,d$get(fr)[2])}
+          ### take the chips from bot X
+          d$remove(fr)
+          ### remove this instruction
+          instlist<-instlist[-i]}}}}
+  ### when all instructions have been executed, return the dictionary (if the bot hadn't been returned earlier)
+  d}
+```
+
+
+```{r}
+part1<-microrunner(input)
+part1$as_list()[order(unlist(part1$keys()))]
+```
+## Part 2
+Just let it run, until there are no instructions left:
+
+```{r}
+
+microrunner2<-function(instlist){
+  d<-dict()
+  while(length(instlist)>0){
+    i<-1
+    while(i<=length(instlist)){
+      inst<-instlist[i]
+      inst<-unlist(str_split(inst," "))
+      if(length(inst)==6){
+        adval<-str_flatten(c(inst[5],inst[6])," ")
+        if(d$has(adval)){d$set(adval,sort(c(d$get(adval),as.numeric(inst[2]))))}else{d$set(adval,c(as.numeric(inst[2])))}
+        instlist<-instlist[-i]
+        next
+      }else{
+        fr<-str_flatten(c(inst[1],inst[2])," ")
+        if(!d$has(fr)){
+          i<-i+1
+          next
+        }else if(length(d$get(fr))<2){
+          i<-i+1
+          next
+        } else{
+          lo<-str_flatten(c(inst[6],inst[7])," ")
+          if(d$has(lo)){d$set(lo,sort(c(d$get(lo),d$get(fr)[1])))}else{d$set(lo,d$get(fr)[1])}
+          hi<-str_flatten(c(inst[11],inst[12])," ")
+          if(d$has(hi)){d$set(hi,sort(c(d$get(hi),d$get(fr)[2])))}else{d$set(hi,d$get(fr)[2])}
+          d$remove(fr)
+          instlist<-instlist[-i]}}}}
+  d}
+```
+
+
+```{r}
+p2<-microrunner2(input)
+part2<-c(p2$get("output 0"),p2$get("output 1"),p2$get("output 2"))
+part2
+part2<-prod(part2)
+part2
 ```
 
