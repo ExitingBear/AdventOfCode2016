@@ -8,28 +8,61 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+## Part 1
+
+```{r}
+
+fillit<-function(st,l){
+  while(nchar(st)<l){
+    bk<-str_flatten(unlist(lapply(str_split(st,""),rev)))
+    bk<-str_replace_all(str_replace_all(str_replace_all(bk,"1","2"),"0","1"),"2","0")
+    st<-str_c(st,"0",bk)}
+  st<-str_sub(st,1,l)
+  st}
 ```
+
+```{r}
+csum<-function(st){
+  while(nchar(st)%%2==0){
+    spl<-unlist(str_split(st,""))
+    spl<-paste0(spl[c(TRUE, FALSE)], spl[c(FALSE, TRUE)])
+    st<-sapply(spl,function(x){
+      if(x %in% c("11","00")){"1"}else{"0"}})
+    st<-str_flatten(st)}
+
+  st}
+```
+
+
+```{r}
+csum("10000011110010000111")
+```
+
+```{r}
+fillthencheck<-function(st,l){
+  st<-fillit(st,l)
+  st<-csum(st)
+  st}
+```
+
+
+```{r}
+fillthencheck("10000",272)
+```
+
+
+
+## Part 2
+
+This is slow, but not unbearably slow.
+
+```{r}
+fillthencheck("10000",35651584)
+```
+
+
 

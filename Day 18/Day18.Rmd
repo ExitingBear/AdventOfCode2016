@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 18 Notebook"
 output: html_notebook
 ---
 
@@ -8,15 +8,42 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
 library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
 library(ds4psy)
 library(numbers)
 options(scipen = 999)
 ```
+
+
+```{r}
+input<-read_lines("Day18Sample.txt")
+```
+
+
+```{r}
+trap<-matrix(".",nrow=1,ncol=nchar(input)+2)
+trap[1,2:(ncol(trap)-1)]<-unlist(str_split(input,""))
+```
+
+```{r}
+trapfinder<-function(trp,rws){
+  for(i in 2:rws){
+    trp[i,(2:ncol(trp)-1)]<-sapply((2:ncol(trp)-1),function(x){
+      if(trp[(i-1),(x-1)]==trp[(i-1),(x+1)]){"."}else{"^"}})}
+  trp}
+
+```
+
+```{r}
+p1<-trapfinder(trap)
+p2<-p1[,2:(ncol(p1)-1)]
+part2<-length(which(p2=="."))
+part1
+```
+
+
+
 
 ```{r,echo=FALSE}
 basicgraph<-ggplot()+

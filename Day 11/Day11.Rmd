@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 11 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,131 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+
+## Part 1
+
+This is going to need a help function called "fried" which takes in a vector of strings.
+If there's a free floating microchip and a free floating RTG - it will be fried.
+
+```{r}
+fried<-function(v){
+  ### microchips
+  Ms<-v[which(str_sub(v,-1)=="M")]
+  ### RTGs
+  Gs<-v[which(str_sub(v,-1)=="G")]
+  ### if only Ms or Gs, return FALSE
+  if(length(Ms)==0||length(Gs)==0){return(FALSE)}
+  ### check each M.  If EVERY M has G, return FALSE, else there's an unpaired M and it's going to get fried.
+  pairGs<-sapply(Ms,function(x){str_c(str_sub(x,end=-2),"G")})
+  if(all(pairGs %in% Gs)){return(FALSE)}else{return(TRUE)}}
 ```
 
+
+```{r}
+testcases<-list(
+  c("AM","BM","CM"),  ##only microchips
+  c(), ##empty
+  c("AG","BG","CG"), ##rtgs
+  c("AM","BM","AG","BG"), #all pairs
+  c("AM","BM","AG"), ##leftover microchip
+  c("AM","AG","BG"),  ## leftover rtg
+  c("AM","BM","CG","DG"), ##nothing matches
+  c("AM","BM","AG","DG") ## some matches, some don't
+) #some matches, but some leftover
+```
+
+
+```{r}
+sapply(testcases,function(x){fried(x)})  
+```
+
+
+With that - BFS.
+
+I have to admit I have no idea whatsoever how to read this data in.  None.  It's going to be manual.
+
+```{r}
+elevateme<-function(f1,f2,f3,f4){
+  beenthere<-dict()
+  pq<-priority_queue()
+  floor<-1
+  el<-c()
+  steps<-0
+  allthings<-length(f1)+length(f2)+length(f3)+length(f4)
+  pri<-steps+(.5*length(f3))+length(f2)+(1.5*length(f1))
+  pq$push(list(floor,el,f1,f2,f3,f4,0),-pri)
+    while(pq$size()>0){
+    ###pop
+    curr<-pq$pop()
+
+    ### if fourth floor contains all of the things, done!
+    if(length(curr[[6]])+length(curr[[2]])==allthings&&curr[[1]]==4){return(curr)}
+    ### if have been before, next
+    chkd<-
+      str_flatten(c(
+        curr[[1]],
+        str_flatten(curr[[2]]),
+        str_flatten(curr[[3]]),
+        str_flatten(curr[[4]]),
+        str_flatten(curr[[5]]),
+        str_flatten(curr[[6]])),
+        collapse="-")
+    for(i in 1:(allthings/2)){
+      x<-str_locate(chkd,"[^0-9-MG]")[1]
+      x<-str_sub(chkd,x,x+1)
+      chkd<-str_replace_all(chkd,x,as.character(i))}
+    if(beenthere$has(chkd)){next}
+    beenthere$set(chkd,curr[[7]])
+    ### else combine elevator with floor
+    cmb<-c(curr[[2]],curr[[curr[[1]]+2]])
+    ### if fried, next
+    if(fried(cmb)){next}
+    ### get list of all single & doubles of combined
+    pels<-as.list(cmb)
+    if(length(cmb)>1){
+    for(i in 1:(length(cmb)-1)){
+      for(j in (i+1):length(cmb)){
+        x<-c(cmb[i],cmb[j])
+        pels<-c(pels,list(x))}}}
+    for(i in 1:length(pels)){
+      p<-sort(unlist(pels[i]))
+      ### find what's left on the floor
+      fl<-sort(cmb[-which(cmb %in% p)])
+      ### if left on the floor is fried, stop
+      if(!fried(fl)&&!fried(p)){
+        ### create the up & down
+        if(curr[[1]]<4){
+          up<-list(curr[[1]]+1,p,curr[[3]],curr[[4]],curr[[5]],curr[[6]],curr[[7]]+1) 
+          up[[curr[[1]]+2]]<-fl
+          pri<-up[[7]]+(.5*length(up[[5]]))+length(up[[4]])+(1.5*length(up[[3]]))+(4-curr[[1]])
+          pq$push(up,-pri)}
+        
+        if(curr[[1]]>1){
+          dwn<-list(curr[[1]]-1,p,curr[[3]],curr[[4]],curr[[5]],curr[[6]],curr[[7]]+1)
+          dwn[[curr[[1]]+2]]<-fl
+          pri<-dwn[[7]]+(.5*length(dwn[[5]]))+length(dwn[[4]])+(1.5*length(dwn[[3]]))+(4-curr[[1]])
+          pq$push(dwn,-pri)}}}
+    }
+  curr}
+```
+
+
+
+```{r}
+p1<-elevateme(c("HyM","LiM"),c("HyG"),c("LiG"),c())
+part1<-(p1[[7]])
+part1
+```
+
+## Part 2
+
+```{r}
+p2<-elevateme(c("HyM","LiM","ElG","ElM","DiG","DiM"),c("HyG"),c("LiG"),c())
+part2<-(p2[[7]])
+part2
+```

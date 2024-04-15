@@ -1,0 +1,176 @@
+---
+title: "Day 11 Notebook"
+output: html_notebook
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+library(dplyr)
+library(stringr)
+library(tidyverse)
+library(readr)
+library(collections)
+options(scipen = 999)
+```
+
+
+## Part 1
+
+This is going to need a help function called "fried" which takes in a vector of strings.
+If there's a free floating microchip and a free floating RTG - it will be fried.
+
+```{r}
+fried<-function(v){
+  ### microchips
+  Ms<-v[which(str_sub(v,-1)=="M")]
+  ### RTGs
+  Gs<-v[which(str_sub(v,-1)=="G")]
+  ### if only Ms or Gs, return FALSE
+  if(length(Ms)==0||length(Gs)==0){return(FALSE)}
+  ### check each M.  If EVERY M has G, return FALSE, else there's an unpaired M and it's going to get fried.
+  pairGs<-sapply(Ms,function(x){str_c(str_sub(x,end=-2),"G")})
+  if(all(pairGs %in% Gs)){return(FALSE)}else{return(TRUE)}}
+```
+
+
+
+```{r}
+sapply(testcases,function(x){fried(x)})  
+```
+
+With that search
+
+I have to admit I have no idea whatsoever how to read this data in.
+
+
+```{r}
+elevateme<-function(f1,f2,f3,f4){
+  ### set up the dictionary & priority queue
+  beenthere<-dict()
+  pq<-priority_queue()
+  ### set up the elevator, starting floor, and starting steps
+  floor<-1
+  el<-c()
+  steps<-0
+  ### count of how many things there are
+  allthings<-length(f1)+length(f2)+length(f3)+length(f4)
+  pri<-steps
+  ### push the start
+  pq$push(list(floor,el,f1,f2,f3,f4,0),-pri)
+  
+  
+  
+  
+  counter<-1
+  maxstp<-0
+  
+  
+  while(pq$size()>0){
+    ###pop
+    curr<-pq$pop()
+    
+        if(curr[[7]]>maxstp){
+      cat(curr[[7]],pq$size(),counter,"\n")
+      maxstp<-curr[[7]]
+    }
+
+    
+    
+    
+    
+    ### if fourth floor contains all of the things, done!
+    if(length(curr[[6]])+length(curr[[2]])==allthings&&curr[[1]]==4){return(curr)}
+    ### if have been in a similar situation before before, next
+    chkd<-
+      str_flatten(c(
+        curr[[1]],
+        str_flatten(curr[[2]]),
+        str_flatten(curr[[3]]),
+        str_flatten(curr[[4]]),
+        str_flatten(curr[[5]]),
+        str_flatten(curr[[6]])),
+        collapse="-")
+    
+    ### if floor 1 is empty and elevator is on 1, dump it.
+    if(curr[[1]]==1&&length(curr[[3]])==0){next}
+    ### if floors 1 & two are empty & the elevator is on 2, dump it.
+    if(curr[[1]]==2&&length(curr[[3]])==0&&length(curr[[4]])==0){next}
+
+    
+    ### all pairs in the same place are equivalent to all pairs in the same place - so, generalize them to nothing
+    if(str_detect(chkd,"([A-Z][a-z])G\\1M")==TRUE){
+      chkd<-str_replace_all(chkd,"([A-Z][a-z])G\\1M","ZZ")}
+    ### if there's an M on floor 1 & its pair is on floor 3, it's the same as any other f1M/f3G pair-abstract them.
+    i<-1
+    while(str_detect(chkd,"[^0-9-MGZ]")==TRUE){
+      x<-str_locate(chkd,"[^0-9-MGZ]")[1]
+      x<-str_sub(chkd,x,x+1)
+      chkd<-str_replace_all(chkd,x,as.character(i))
+      i<-i+1}
+    ### sort the floors
+    chkd<-unlist(str_split(chkd,"-"))
+    chkd<-sapply(chkd,function(y){
+      if(nchar(y)==0){return(0)}
+      a<-c()
+      for(i in seq(from=1,to=nchar(y),by=2)){
+        a<-c(a,str_sub(y,i,i+1))}
+      a<-str_flatten(a[order(a)])
+      return(a)})
+    chkd<-str_flatten(unlist(chkd),collapse="-")
+    ### this gets rid of a lot of the redundant (though the same) states, but not all.
+    
+    if(beenthere$has(chkd)){next}
+    beenthere$set(chkd,curr[[7]])
+
+    ### else combine elevator with floor
+    cmb<-c(curr[[2]],curr[[curr[[1]]+2]])
+    ### if fried, next
+    if(fried(cmb)){next}
+    ### get list of all single & doubles of combined
+    pels<-as.list(cmb)
+    if(length(cmb)>1){
+      for(i in 1:(length(cmb)-1)){
+        for(j in (i+1):length(cmb)){
+          x<-c(cmb[i],cmb[j])
+          pels<-c(pels,list(x))}}}
+    for(i in 1:length(pels)){
+      p<-(unlist(pels[i]))
+      ### find what's left on the floor
+      fl<-(cmb[-which(cmb %in% p)])
+      ### if left on the floor is fried, stop
+      if(!fried(fl)&&!fried(p)){
+        ### create the up & down
+        if(curr[[1]]<4){
+          up<-list(curr[[1]]+1,p,curr[[3]],curr[[4]],curr[[5]],curr[[6]],curr[[7]]+1) 
+          up[[curr[[1]]+2]]<-fl
+          #### priority - is the number of steps taken + the number it would take if you could ride with an empty elevator.
+          pri<-up[[7]]+(length(up[[5]])-1)+(2*length(up[[4]])-2)+(3*length(up[[3]])-3)+(4-up[[1]])
+          pq$push(up,-pri)}
+        
+        if(curr[[1]]>1){
+          dwn<-list(curr[[1]]-1,p,curr[[3]],curr[[4]],curr[[5]],curr[[6]],curr[[7]]+1)
+          dwn[[curr[[1]]+2]]<-fl
+          pri<-dwn[[7]]+(length(dwn[[5]])-1)+(2*length(dwn[[4]])-2)+(3*length(dwn[[3]])-3)+(4-dwn[[1]])
+          pq$push(dwn,-pri)}}}
+    
+    counter<-counter+1
+  }
+  ### if something goes wrong, 
+  curr}
+```
+
+
+```{r}
+p1<-elevateme(c("PoG","ThG","ThM","PrG","RuG","RuM","CoM","CoG"),c("PoM","PrM"),c(),c())
+part1<-(p1[[7]])
+part1
+```
+
+
+
+## Part 2
+```{r}
+p2<-elevateme(c("PoG","ThG","ThM","PrG","RuG","RuM","CoM","CoG","ElG","ElM","DiG","DiM"),c("PoM","PrM"),c(),c())
+part2<-(p2[[7]])
+part2
+```

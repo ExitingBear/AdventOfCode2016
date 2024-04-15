@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 15 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,69 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+```{r}
+input<-read_lines("Day15Sample.txt")
+### pull out info, so that it's disc number, positions, starting position
+
+discs<-lapply(input,function(x){
+  x<-as.numeric(unlist(str_split(x,"[# .]"))[c(3,5,13)])})
 ```
 
+## Part 1
+
+Quick function that returns true if it drops through, false if it would bounce
+
+```{r}
+passthrough<-function(dt,dsc){
+  if((dt+dsc[1]+dsc[3])%%dsc[2]==0){return(TRUE)}else{return(FALSE)}}
+```
+
+Find the first place for the ball to fall through the first disc:
+
+```{r}
+part1<-0
+bounce<-TRUE
+while(bounce){
+  ok<-passthrough(part1,discs[[1]])
+  if(ok){bounce<-FALSE}else{part1<-part1+1}}
+part1
+```
+
+For all the other discs (because the number of slots is always prime):
+start with the current shortest time - and the period where all the above discs will line up
+check the next X cycles (where X is the number of slots in the current disc)
+```{r}
+d<-2
+while(d<=length(discs)){
+### poss(ible) stars with the current valid time - then repeats for each period 
+    poss<-seq(from=part1,
+            to=discs[[d]][2]*prod(sapply(discs[1:(d-1)],function(x){x[2]})),
+            by=prod(sapply(discs[1:(d-1)],function(x){x[2]})))
+    ###check each repeat to see if it will fall through this new disc - the one that does is the next starting point
+    part1<-poss[which(sapply(poss,function(x){passthrough(x,discs[[d]])}))]
+    d<-d+1}
+part1
+```
+
+## Part 2
+
+The new disc has 11 slots, so do the above with 11.
+
+```{r}
+####These are the possible answers
+poss<-seq(from=part1,to=11*prod(sapply(discs,function(x){x[2]})),by=prod(sapply(discs,function(x){x[2]})))
+
+### figure out which one will pass through the new disc (c(7,11,0))
+part2<-poss[which(sapply(poss,function(x){passthrough(x,c(7,11,0))}))]
+part2
+```
+
+To prove it works - quickly run it through all discs
+
+```{r}
+sapply(discs,function(x){passthrough(part2,x)})
+```

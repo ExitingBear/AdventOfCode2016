@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 12 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,66 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+```{r}
+input<-read_lines("Day12Sample.txt")
 ```
 
+## Part 1
+
+Having read part 2, set things so that it is easy to enter new values for the registers
+
+```{r}
+assembunny<-function(instructions=input,a,b,c,d){
+  ### set up registsers
+  r<-dict(list("a"=a,"b"=b,"c"=c,"d"=d))
+  i<-1
+  ### i is the instruction being read stop when out of instructions
+  while(i<=length(instructions)){
+    ### break this into pieces in a list
+    inst<-as.list(unlist(str_split(instructions[i]," ")))
+    ### turn numbers into numbers rather than strings
+    for(j in 2:length(inst)){
+      if(str_detect(inst[[j]],"[0-9]")){
+        inst[[j]]<-as.numeric(inst[[j]])
+      }}
+    ### run through the instructions
+    switch(inst[[1]],
+           ### if cpy, put the number in the register
+           "cpy"={if(is.numeric(inst[[2]])){r$set(inst[[3]],inst[[2]])}else{r$set(inst[[3]],r$get(inst[[2]]))}
+             i<-i+1},
+           ### increase the register
+           "inc"={r$set(inst[[2]],r$get(inst[[2]])+1)
+             i<-i+1},
+           ### decrease the register
+           "dec"={r$set(inst[[2]],r$get(inst[[2]])-1)
+             i<-i+1},
+           ### jump if NOT zero (in my input, there is a placeholder instruction,
+           ### so while the second slot is usually a register, it doesn't have to be)
+           "jnz"={if(is.numeric(inst[[2]])){
+             if(inst[[2]]!=0){i<-i+inst[[3]]}else{i<-i+1}
+             }else{if(r$get(inst[[2]])!=0){i<-i+inst[[3]]}else{i<-i+1}}},
+           cat("something went wrong\n"))}
+  ### return the register
+  r}
+```
+
+
+
+```{r}
+part1<-assembunny(input,0,0,0,0)
+part1$get("a")
+```
+
+## Part 2
+```{r}
+part2<-assembunny(input,0,0,1,0)
+part2$get("a")
+### For my input, the first 16 lines find the 28th fibonacci number if c is 0, or the 35th if c is not 0.
+### The last seven add 196.
+### based on this - the answer is very derivable, but run it anyway to make sure things do what I believe the code said they should do.
+```

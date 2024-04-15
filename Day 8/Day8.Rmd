@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 8 Notebook"
 output: html_notebook
 ---
 
@@ -8,18 +8,76 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
 library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(reshape2)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
+Everything is a matrix.
+```{r}
+input<-read_lines("Day8Sample.txt")
+display<-matrix(".",ncol=7,nrow=3)
+```
+
+Determine if it is a rectangle instruction, if so, draw the rectangle
+Otherwise, determine the offset & offset it.
+
+```{r}
+runinst<-function(inline,d=display){
+  ### split into pieces.  rectangle instructions have 2, the others have 5.
+  il<-unlist(str_split(inline," "))
+  if(length(il)==2){
+    ### pull into the x & y
+    il<-as.numeric(unlist(str_split(il[2],"x")))
+    ### update the matix
+    d[1:il[2],1:il[1]]<-"#"
+  }else{
+    ### the number in space 5 is the offset
+    ofs<-as.numeric(il[5])
+    ### the number after the equal sign is the row or column (add 1 because r is one-based)
+    rc<-as.numeric(unlist(str_split_i(il[3],"=",2)))+1
+    ### if it is x
+    if(unlist(str_split_i(il[3],"=",1))==c("x")){
+      ### copy the column, then rearrange it (could be done in one line, this is less confusing/)
+      x<-d[,rc]
+      d[,rc]<-c(tail(x,ofs),head(x,length(x)-ofs))
+      ### if it is y, same thing - but with the row, not column
+    }else{
+      y<-d[rc,]
+      d[rc,]<-c(tail(y,ofs),head(y,length(y)-ofs))}}
+  ### return the updated display
+  d}
+
+```
+
+Run this off of all of the instructions in the input
+
+```{r}
+lightup<-function(instlist=input,d=display){
+  for(i in 1:length(instlist)){
+    d<-runinst(instlist[i],d)}
+  d}
+```
+
+
+
+```{r}
+p1<-lightup(input,display)
+part1<-length(which(p1=="#"))
+part1
+```
+
+## Part 2
+
+Graph it - in the real input, this looks like letters.
+
+```{r}
+
+pg1<-melt(p1)
+displaygraph<-ggplot(data=pg1,aes(x=Var2,y=Var1,colour=value))+
+  geom_point()+
+  scale_color_manual(values=c("black", "white"))+
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.y = element_blank(),
@@ -29,7 +87,8 @@ basicgraph<-ggplot()+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position="none")+
-  scale_y_reverse+
+  scale_y_reverse()+
   coord_fixed()
+displaygraph
 ```
 
