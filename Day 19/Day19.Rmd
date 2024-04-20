@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 19 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,99 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
 library(numbers)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+## Part 1
+I think I can do this by removing every other elf (if there's an even number of elves) or removing every other elf & then removing first elf, if there's an odd number.
+
+```{r}
+### start by creating the elves
+part1<-1:5
+### while there are still elves 
+while(length(part1)>1){
+  ### if there are an even number of elves, then the elves in an "odd" position (first, third, fifth,etc.) will get to steal
+  ### the elves in an "even" position will be kicked out
+  if(length(part1)%%2==0){part1<-part1[c(TRUE,FALSE)]
+  ### if there are an odd number of elves, the elves in an "odd" position will steal,
+  ### the elves in an even position will be kicked out
+  ### and the final "odd" elf will steal the first elf - setting up for a new round.
+  }else{part1<-part1[c(TRUE,FALSE)]
+  part1<-part1[-1]}}
+part1
 ```
 
+## Part 2
+Start by creating the elves
+and a pointer to show which elf is the one doing the theiving.
+if there are an even number of elves, remove the elf halfway around the circle.
+if there an odd number of elves, remove the elf halfway (round down)
+increase the pointer
+```{r}
+part2<-1:20
+
+slowp2<-function(x){
+  x<-1:x
+  i<-1
+  while(length(x)>1){
+    ### the one to remove is half of the circle away - mod by the length of the circle if you coil around to the beginning
+    rmv<-floor(i+(length(x)/2))%%length(x)
+    ### and because 1 indexed, use length of the circle instead of 0
+    if(rmv==0){rmv<-length(x)}
+    #cat("circle: ",length(x)," elf: ",x[i],"at: ",i," robbed: ",x[rmv]," at: ",rmv,"\n")
+    #cat("*******",paste(part2),"\n")
+    ### remove that elf
+    x<-x[-rmv]
+    ## if the elf removed has a lower number than the elf who stole
+    ## then everyone will move up a position and you *don't* increase
+    ## the index to get to the next elf.
+    ## otherwise, increase the index.
+    if(rmv>i){i<-i+1}
+    if(i>length(x)){i<-1}
+    
+    #  if(i==1){cat(paste(x),"\n")}
+  }
+  x}
+```
+This takes forever.
+
+There's a pattern as to which elves are left at the end of every round, it is dependent on how many elves there are at the beginning- 
+
+```{r}
+lastelfstanding<-function(x){
+  x<-1:x
+  lx<-length(x)
+  while(lx>1){
+    ### the number of elves is a multiple of 3
+    if(lx%%3==0){x<-x[c(FALSE,FALSE,TRUE)]
+    }else{
+      ### 4 cases
+      ### even number of elves and elves MOD 3 is 2
+      if(lx%%3==2&&lx%%2==0){
+        x<-c(x[1:(lx/2)][c(F,T,F)],x[(lx/2):lx][c(T,F,F)])
+        if(any(is.na(x))){x<-x[-(which(is.na(x)))]}
+        ###odd number of elves and elves MOD 3 is 2
+      }else if(lx%%3==2&&lx%%2==1){
+        x<-c(x[1:floor(lx/2)][c(F,T,F)],x[ceiling(lx/2):lx][c(F,T,F)])
+        #    cat(x,"\n")
+        if(any(is.na(x))){x<-x[-(which(is.na(x)))]}
+        ###even number of elves and elves MOD 3 is 1
+      }else if(lx%%3==1&&lx%%2==0){
+        x<-c(x[1:(lx/2)][c(T,F,F)],x[(lx/2):lx][c(T,F,F)])
+        if(any(is.na(x))){x<-x[-(which(is.na(x)))]}
+        ###odd number of elves and elves MOD 3 is 1
+      }else if(lx%%3==1&&lx%%2==1){
+        x<-c(x[1:floor(lx/2)][c(T,F,F)],x[floor(lx/2)],x[ceiling(lx/2):lx][c(F,T,F)])
+        if(any(is.na(x))){x<-x[-(which(is.na(x)))]}
+      }else{cat("something went wrong")}}
+    lx<-length(x)}
+  x}
+```
+
+```{r}
+
+part2<-lastelfstanding(5)
+part2
+```

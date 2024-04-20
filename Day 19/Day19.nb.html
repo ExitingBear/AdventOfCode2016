@@ -11,7 +11,7 @@
 
 
 
-<title>Day 18 Notebook</title>
+<title>Day 19 Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day 18 Notebook</h1>
+<h1 class="title toc-ignore">Day 19 Notebook</h1>
 
 </div>
 
@@ -1754,108 +1754,121 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-text-begin -->
+<div id="part-1" class="section level2">
+<h2>Part 1</h2>
+<p>I think I can do this by removing every other elf (if there’s an even
+number of elves) or removing every other elf &amp; then removing first
+elf, if there’s an odd number.</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkxOFNhbXBsZTIudHh0XCIpXG5gYGAifQ== -->
-<pre class="r"><code>input&lt;-read_lines(&quot;Day18Sample2.txt&quot;)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhcDwtbWF0cml4KFwiLlwiLG5yb3c9MSxuY29sPW5jaGFyKGlucHV0KSsyKVxudHJhcFsxLDI6KG5jb2wodHJhcCktMSldPC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0LFwiXCIpKVxuYGBgIn0= -->
-<pre class="r"><code>trap&lt;-matrix(&quot;.&quot;,nrow=1,ncol=nchar(input)+2)
-trap[1,2:(ncol(trap)-1)]&lt;-unlist(str_split(input,&quot;&quot;))</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhcGZpbmRlcjwtZnVuY3Rpb24odHJwLHJ3cyl7XG4gIGZvcihpIGluIDI6cndzKXtcbiAgICB5PC1jKFwiLlwiLFxuICAgICAgICAgc2FwcGx5KDI6KG5jb2wodHJwKS0xKSxmdW5jdGlvbih4KXtpZih0cnBbKGktMSksKHgtMSldPT10cnBbKGktMSksKHgrMSldKXtcIi5cIn1lbHNle1wiXlwifX0pLFxuICAgICAgICAgXCIuXCIpXG4gICAgdHJwPC1yYmluZCh0cnAseSl9XG4gIHRycH1cblxuYGBgIn0= -->
-<pre class="r"><code>trapfinder&lt;-function(trp,rws){
-  for(i in 2:rws){
-    y&lt;-c(&quot;.&quot;,
-         sapply(2:(ncol(trp)-1),function(x){if(trp[(i-1),(x-1)]==trp[(i-1),(x+1)]){&quot;.&quot;}else{&quot;^&quot;}}),
-         &quot;.&quot;)
-    trp&lt;-rbind(trp,y)}
-  trp}
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucDE8LXRyYXBmaW5kZXIodHJhcCwxMClcbnAxPC1wMVssMjoobmNvbChwMSktMSldXG5wYXJ0MTwtbGVuZ3RoKHdoaWNoKHAxPT1cIi5cIikpXG5wYXJ0MVxuYGBgIn0= -->
-<pre class="r"><code>p1&lt;-trapfinder(trap,10)
-p1&lt;-p1[,2:(ncol(p1)-1)]
-part1&lt;-length(which(p1==&quot;.&quot;))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIHN0YXJ0IGJ5IGNyZWF0aW5nIHRoZSBlbHZlc1xucGFydDE8LTE6NVxuIyMjIHdoaWxlIHRoZXJlIGFyZSBzdGlsbCBlbHZlcyBcbndoaWxlKGxlbmd0aChwYXJ0MSk+MSl7XG4gICMjIyBpZiB0aGVyZSBhcmUgYW4gZXZlbiBudW1iZXIgb2YgZWx2ZXMsIHRoZW4gdGhlIGVsdmVzIGluIGFuIFwib2RkXCIgcG9zaXRpb24gKGZpcnN0LCB0aGlyZCwgZmlmdGgsZXRjLikgd2lsbCBnZXQgdG8gc3RlYWxcbiAgIyMjIHRoZSBlbHZlcyBpbiBhbiBcImV2ZW5cIiBwb3NpdGlvbiB3aWxsIGJlIGtpY2tlZCBvdXRcbiAgaWYobGVuZ3RoKHBhcnQxKSUlMj09MCl7cGFydDE8LXBhcnQxW2MoVFJVRSxGQUxTRSldXG4gICMjIyBpZiB0aGVyZSBhcmUgYW4gb2RkIG51bWJlciBvZiBlbHZlcywgdGhlIGVsdmVzIGluIGFuIFwib2RkXCIgcG9zaXRpb24gd2lsbCBzdGVhbCxcbiAgIyMjIHRoZSBlbHZlcyBpbiBhbiBldmVuIHBvc2l0aW9uIHdpbGwgYmUga2lja2VkIG91dFxuICAjIyMgYW5kIHRoZSBmaW5hbCBcIm9kZFwiIGVsZiB3aWxsIHN0ZWFsIHRoZSBmaXJzdCBlbGYgLSBzZXR0aW5nIHVwIGZvciBhIG5ldyByb3VuZC5cbiAgfWVsc2V7cGFydDE8LXBhcnQxW2MoVFJVRSxGQUxTRSldXG4gIHBhcnQxPC1wYXJ0MVstMV19fVxucGFydDFcbmBgYCJ9 -->
+<pre class="r"><code>### start by creating the elves
+part1&lt;-1:5
+### while there are still elves 
+while(length(part1)&gt;1){
+  ### if there are an even number of elves, then the elves in an &quot;odd&quot; position (first, third, fifth,etc.) will get to steal
+  ### the elves in an &quot;even&quot; position will be kicked out
+  if(length(part1)%%2==0){part1&lt;-part1[c(TRUE,FALSE)]
+  ### if there are an odd number of elves, the elves in an &quot;odd&quot; position will steal,
+  ### the elves in an even position will be kicked out
+  ### and the final &quot;odd&quot; elf will steal the first elf - setting up for a new round.
+  }else{part1&lt;-part1[c(TRUE,FALSE)]
+  part1&lt;-part1[-1]}}
 part1</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM4XG4ifQ== -->
-<pre><code>[1] 38</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDNcbiJ9 -->
+<pre><code>[1] 3</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-plot-begin eyJoZWlnaHQiOjQzMi42MzI5LCJ3aWR0aCI6NzAwLCJzaXplX2JlaGF2aW9yIjowLCJjb25kaXRpb25zIjpbXX0= -->
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnUAAAGFCAMAAACsU/XiAAAADFBMVEUAv8Tr6+v4dm3///+pEUAzAAAACXBIWXMAAA05AAANOQGumz/oAAAJo0lEQVR4nO2cwW7kwBHFnM3//3PutoMpaGuaPUvyaAhqjUgYOr2v/0ac5ot+gBBSdXGeqovzVF2cp+riPHx1/4nzwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgns/GOr+1q86s5bja56eCvY+X3V/fnzZ/IeZ04mVy0eePzZv4ZXff8L7Py66v78Gakbve6vyVWLB24++/gXProV7PxDqxv1tFnd6VvNrvoaX/XtT7DzD67u5ev+Gl21eODirTZ/4S8Xwc6vq274bbTI4oHHn/0psPP7qosDwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgns/MLqNtfVF4fTFzn+VK1hf+fHG1odHx9cNRvYHF013WBf23N/eiDs/J+ubnHCenTV5gb7ew+EnV9X3fGt6OPVzX7hew+EnV9X3XHO/68b8d4DYedVd/67bsZbD4SdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdX1jdaKF8OBc4utfigZ/y7LDz+6rb24qeb2ZvHfgxzw47/6erG81OHz9wubpHB8LOr6tucaF8tsF+/MDFpfbHB8LOr6tuyObu9OkDL3h22PmnVhd/Bey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzv/x6vYWpc+z+Ow/roKd31fdbMlyOIk+kTK6aHYg8OzPfiHs/LrqZqu9d65hbz774gb7L1fBzqtulubx6sbP/ugXws7/5eqOb7BvV7e0wf7LRbDz66pb/TZa5Ph33VuBnd9XXRwAdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnH1vdw/HxN99qBn8g7Py+6qYL5WsT5Yu3Ov7sTw+EnV9X3fJC+dHqNp/9vQfCzj+0uvduRT+9avHZ33wg7PxDq7uT48/++EDY+XXV3bBQ/pg7l+F/AXZ+X3VxANh51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnV9Y3eJC+WhUcLg8ODlw8VabB/68CnZ+X3W7C+WvrSxOWF+6hv3LVbDzqqu681xX3eJC+WZ1n7zBXnU/efnS/oLN77q18zbpu+4h75ARL4CdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2PmF1S2uYc+umt1qEf7ZYef3VTca7d28anarxdnP1Wd/ttQOO7+xurXXPRoAvnNYe/4LX1/ULvFPfr7HzZ5ms9Ovb7U8rP36wPeOgsPOr6xu6XV/za96eeDpOffNX1h1P3n5/u/g9Jz7Jn3X/QDxYAd2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOcXVrc3Tj1dp54cuDmJvvgLHx4IO7+vur2Z4Pli6+sDF8epN3/h0wNh51X3yaPvjw+EnV9X3eI49eyqT57ffnwg7Py66oZsftfdyVufHXb+qdXFXwE7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOPre74hPUiiwe2hv2M7y9kuD0+62m2ODy51eixNp99dK/ppvL3v8DOr6tutjh85zj15rO3wf5Wnr7trepmt1qsbvHA+ZL3tz/Bzj+4uvsm0RefvQ329/LL636pBGDxu27xwKfAzu+rLg4AO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzC6tbXFef8e/PubeG/Z0fb2hvXX26Y7524GycerbC2Qb7O3n6IvEd8/c+VRvsb+XnG1rb9B8vSi8duLhz3Qb7e3n8Ijd3zHcOnE2ib1fXBvsDXr7/v+DOPffF77qnwM7/7eri/wA7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsHO+uvBRdXGeqovzVF2cp+riPFUX56m6OE/VxXmqLs5TdXGe/wH2+PRyYByjhwAAAABJRU5ErkJggg==" /></p>
-<!-- rnb-plot-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+</div>
 <div id="part-2" class="section level2">
 <h2>Part 2</h2>
-<p>Come (very belatedly) to the realization that i don’t actually have
-to store this - just count the spaces:</p>
+<p>Start by creating the elves and a pointer to show which elf is the
+one doing the theiving. if there are an even number of elves, remove the
+elf halfway around the circle. if there an odd number of elves, remove
+the elf halfway (round down) increase the pointer</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BhY2VmaW5kZXI8LWZ1bmN0aW9uKHRycCxyd3Mpe1xuICAjI3N0YXJ0IHdvcmtpbmcgd2l0aCB0aGUgc3RyaW5nIGl0c2VsZiwgbm8gbWF0cml4XG4gICMjY2hhbmdlIGl0IGludG8gYSB2ZWN0b3JcbiAgdHJwPC11bmxpc3Qoc3RyX3NwbGl0KHRycCxcIlwiKSlcbiAgIyMgY291bnQgdGhlIHNwYWNlc1xuICBzcGM8LWxlbmd0aCh3aGljaCh0cnA9PVwiLlwiKSlcbiAgIyMgYXBwZW5kIHNwYWNlcyB0byBlYWNoIGVkZ2UgKGJlY2F1c2UgSSdtIGxhenkpXG4gIHRycDwtYyhcIi5cIix0cnAsXCIuXCIpXG4gIGZvcihpIGluIDI6cndzKXtcbiAgICAjIyBjcmVhdGUgYW5vdGhlciB2ZWN0b3IgYmFzZWQgb24gdGhlIGZpcnN0XG4gICAgeTwtYyhcIi5cIixcbiAgICAgICAgIHNhcHBseSgyOihsZW5ndGgodHJwKS0xKSxmdW5jdGlvbih4KXtpZih0cnBbKHgtMSldPT10cnBbKHgrMSldKXtcIi5cIn1lbHNle1wiXlwifX0pLFxuICAgICAgICAgXCIuXCIpXG4gICAgIyMgY291bnQgdGhlIHNwYWNlcyBpbiB0aGF0IHZlY3RvciwgYWRkIHRvIHRvdGFsICgtMiB0byBkZWFsIHdpdGggdGhlIGV4dHJhIHNwYWNlcyBhdCB0aGUgZW5kLilcbiAgICBzcGM8LXNwYytsZW5ndGgod2hpY2goeT09XCIuXCIpKS0yXG4gICAgIyMgbW92ZSB0aGUgbmV3IHZlY3RvciB0byB0aGUgd29ya2luZyB2ZWN0b3Igc2xvdCBhbmQgcmVwZWF0XG4gICAgdHJwPC15fVxuICAjIyByZXR1cm4gdGhlIG51bWJlciBvZiBzcGFjZXMuXG4gIHNwY31cblxuYGBgIn0= -->
-<pre class="r"><code>spacefinder&lt;-function(trp,rws){
-  ##start working with the string itself, no matrix
-  ##change it into a vector
-  trp&lt;-unlist(str_split(trp,&quot;&quot;))
-  ## count the spaces
-  spc&lt;-length(which(trp==&quot;.&quot;))
-  ## append spaces to each edge (because I&#39;m lazy)
-  trp&lt;-c(&quot;.&quot;,trp,&quot;.&quot;)
-  for(i in 2:rws){
-    ## create another vector based on the first
-    y&lt;-c(&quot;.&quot;,
-         sapply(2:(length(trp)-1),function(x){if(trp[(x-1)]==trp[(x+1)]){&quot;.&quot;}else{&quot;^&quot;}}),
-         &quot;.&quot;)
-    ## count the spaces in that vector, add to total (-2 to deal with the extra spaces at the end.)
-    spc&lt;-spc+length(which(y==&quot;.&quot;))-2
-    ## move the new vector to the working vector slot and repeat
-    trp&lt;-y}
-  ## return the number of spaces.
-  spc}
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDI8LTE6MjBcblxuc2xvd3AyPC1mdW5jdGlvbih4KXtcbiAgeDwtMTp4XG4gIGk8LTFcbiAgd2hpbGUobGVuZ3RoKHgpPjEpe1xuICAgICMjIyB0aGUgb25lIHRvIHJlbW92ZSBpcyBoYWxmIG9mIHRoZSBjaXJjbGUgYXdheSAtIG1vZCBieSB0aGUgbGVuZ3RoIG9mIHRoZSBjaXJjbGUgaWYgeW91IGNvaWwgYXJvdW5kIHRvIHRoZSBiZWdpbm5pbmdcbiAgICBybXY8LWZsb29yKGkrKGxlbmd0aCh4KS8yKSklJWxlbmd0aCh4KVxuICAgICMjIyBhbmQgYmVjYXVzZSAxIGluZGV4ZWQsIHVzZSBsZW5ndGggb2YgdGhlIGNpcmNsZSBpbnN0ZWFkIG9mIDBcbiAgICBpZihybXY9PTApe3JtdjwtbGVuZ3RoKHgpfVxuICAgICNjYXQoXCJjaXJjbGU6IFwiLGxlbmd0aCh4KSxcIiBlbGY6IFwiLHhbaV0sXCJhdDogXCIsaSxcIiByb2JiZWQ6IFwiLHhbcm12XSxcIiBhdDogXCIscm12LFwiXFxuXCIpXG4gICAgI2NhdChcIioqKioqKipcIixwYXN0ZShwYXJ0MiksXCJcXG5cIilcbiAgICAjIyMgcmVtb3ZlIHRoYXQgZWxmXG4gICAgeDwteFstcm12XVxuICAgICMjIGlmIHRoZSBlbGYgcmVtb3ZlZCBoYXMgYSBsb3dlciBudW1iZXIgdGhhbiB0aGUgZWxmIHdobyBzdG9sZVxuICAgICMjIHRoZW4gZXZlcnlvbmUgd2lsbCBtb3ZlIHVwIGEgcG9zaXRpb24gYW5kIHlvdSAqZG9uJ3QqIGluY3JlYXNlXG4gICAgIyMgdGhlIGluZGV4IHRvIGdldCB0byB0aGUgbmV4dCBlbGYuXG4gICAgIyMgb3RoZXJ3aXNlLCBpbmNyZWFzZSB0aGUgaW5kZXguXG4gICAgaWYocm12Pmkpe2k8LWkrMX1cbiAgICBpZihpPmxlbmd0aCh4KSl7aTwtMX1cbiAgICBcbiAgICAjICBpZihpPT0xKXtjYXQocGFzdGUoeCksXCJcXG5cIil9XG4gIH1cbiAgeH1cbmBgYCJ9 -->
+<pre class="r"><code>part2&lt;-1:20
+
+slowp2&lt;-function(x){
+  x&lt;-1:x
+  i&lt;-1
+  while(length(x)&gt;1){
+    ### the one to remove is half of the circle away - mod by the length of the circle if you coil around to the beginning
+    rmv&lt;-floor(i+(length(x)/2))%%length(x)
+    ### and because 1 indexed, use length of the circle instead of 0
+    if(rmv==0){rmv&lt;-length(x)}
+    #cat(&quot;circle: &quot;,length(x),&quot; elf: &quot;,x[i],&quot;at: &quot;,i,&quot; robbed: &quot;,x[rmv],&quot; at: &quot;,rmv,&quot;\n&quot;)
+    #cat(&quot;*******&quot;,paste(part2),&quot;\n&quot;)
+    ### remove that elf
+    x&lt;-x[-rmv]
+    ## if the elf removed has a lower number than the elf who stole
+    ## then everyone will move up a position and you *don&#39;t* increase
+    ## the index to get to the next elf.
+    ## otherwise, increase the index.
+    if(rmv&gt;i){i&lt;-i+1}
+    if(i&gt;length(x)){i&lt;-1}
+    
+    #  if(i==1){cat(paste(x),&quot;\n&quot;)}
+  }
+  x}</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<p>This takes forever.</p>
+<p>There’s a pattern as to which elves are left at the end of every
+round, it is dependent on how many elves there are at the beginning-</p>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxubGFzdGVsZnN0YW5kaW5nPC1mdW5jdGlvbih4KXtcbiAgeDwtMTp4XG4gIGx4PC1sZW5ndGgoeClcbiAgd2hpbGUobHg+MSl7XG4gICAgIyMjIHRoZSBudW1iZXIgb2YgZWx2ZXMgaXMgYSBtdWx0aXBsZSBvZiAzXG4gICAgaWYobHglJTM9PTApe3g8LXhbYyhGQUxTRSxGQUxTRSxUUlVFKV1cbiAgICB9ZWxzZXtcbiAgICAgICMjIyA0IGNhc2VzXG4gICAgICAjIyMgZXZlbiBudW1iZXIgb2YgZWx2ZXMgYW5kIGVsdmVzIE1PRCAzIGlzIDJcbiAgICAgIGlmKGx4JSUzPT0yJiZseCUlMj09MCl7XG4gICAgICAgIHg8LWMoeFsxOihseC8yKV1bYyhGLFQsRildLHhbKGx4LzIpOmx4XVtjKFQsRixGKV0pXG4gICAgICAgIGlmKGFueShpcy5uYSh4KSkpe3g8LXhbLSh3aGljaChpcy5uYSh4KSkpXX1cbiAgICAgICAgIyMjb2RkIG51bWJlciBvZiBlbHZlcyBhbmQgZWx2ZXMgTU9EIDMgaXMgMlxuICAgICAgfWVsc2UgaWYobHglJTM9PTImJmx4JSUyPT0xKXtcbiAgICAgICAgeDwtYyh4WzE6Zmxvb3IobHgvMildW2MoRixULEYpXSx4W2NlaWxpbmcobHgvMik6bHhdW2MoRixULEYpXSlcbiAgICAgICAgIyAgICBjYXQoeCxcIlxcblwiKVxuICAgICAgICBpZihhbnkoaXMubmEoeCkpKXt4PC14Wy0od2hpY2goaXMubmEoeCkpKV19XG4gICAgICAgICMjI2V2ZW4gbnVtYmVyIG9mIGVsdmVzIGFuZCBlbHZlcyBNT0QgMyBpcyAxXG4gICAgICB9ZWxzZSBpZihseCUlMz09MSYmbHglJTI9PTApe1xuICAgICAgICB4PC1jKHhbMToobHgvMildW2MoVCxGLEYpXSx4WyhseC8yKTpseF1bYyhULEYsRildKVxuICAgICAgICBpZihhbnkoaXMubmEoeCkpKXt4PC14Wy0od2hpY2goaXMubmEoeCkpKV19XG4gICAgICAgICMjI29kZCBudW1iZXIgb2YgZWx2ZXMgYW5kIGVsdmVzIE1PRCAzIGlzIDFcbiAgICAgIH1lbHNlIGlmKGx4JSUzPT0xJiZseCUlMj09MSl7XG4gICAgICAgIHg8LWMoeFsxOmZsb29yKGx4LzIpXVtjKFQsRixGKV0seFtmbG9vcihseC8yKV0seFtjZWlsaW5nKGx4LzIpOmx4XVtjKEYsVCxGKV0pXG4gICAgICAgIGlmKGFueShpcy5uYSh4KSkpe3g8LXhbLSh3aGljaChpcy5uYSh4KSkpXX1cbiAgICAgIH1lbHNle2NhdChcInNvbWV0aGluZyB3ZW50IHdyb25nXCIpfX1cbiAgICBseDwtbGVuZ3RoKHgpfVxuICB4fVxuYGBgIn0= -->
+<pre class="r"><code>lastelfstanding&lt;-function(x){
+  x&lt;-1:x
+  lx&lt;-length(x)
+  while(lx&gt;1){
+    ### the number of elves is a multiple of 3
+    if(lx%%3==0){x&lt;-x[c(FALSE,FALSE,TRUE)]
+    }else{
+      ### 4 cases
+      ### even number of elves and elves MOD 3 is 2
+      if(lx%%3==2&amp;&amp;lx%%2==0){
+        x&lt;-c(x[1:(lx/2)][c(F,T,F)],x[(lx/2):lx][c(T,F,F)])
+        if(any(is.na(x))){x&lt;-x[-(which(is.na(x)))]}
+        ###odd number of elves and elves MOD 3 is 2
+      }else if(lx%%3==2&amp;&amp;lx%%2==1){
+        x&lt;-c(x[1:floor(lx/2)][c(F,T,F)],x[ceiling(lx/2):lx][c(F,T,F)])
+        #    cat(x,&quot;\n&quot;)
+        if(any(is.na(x))){x&lt;-x[-(which(is.na(x)))]}
+        ###even number of elves and elves MOD 3 is 1
+      }else if(lx%%3==1&amp;&amp;lx%%2==0){
+        x&lt;-c(x[1:(lx/2)][c(T,F,F)],x[(lx/2):lx][c(T,F,F)])
+        if(any(is.na(x))){x&lt;-x[-(which(is.na(x)))]}
+        ###odd number of elves and elves MOD 3 is 1
+      }else if(lx%%3==1&amp;&amp;lx%%2==1){
+        x&lt;-c(x[1:floor(lx/2)][c(T,F,F)],x[floor(lx/2)],x[ceiling(lx/2):lx][c(F,T,F)])
+        if(any(is.na(x))){x&lt;-x[-(which(is.na(x)))]}
+      }else{cat(&quot;something went wrong&quot;)}}
+    lx&lt;-length(x)}
+  x}</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BhY2VmaW5kZXIoaW5wdXQsMTApXG5gYGAifQ== -->
-<pre class="r"><code>spacefinder(input,10)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM4XG4ifQ== -->
-<pre><code>[1] 38</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDI8LXNwYWNlZmluZGVyKGlucHV0LDEwMDAwMClcbnBhcnQyXG5gYGAifQ== -->
-<pre class="r"><code>part2&lt;-spacefinder(input,100000)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5wYXJ0MjwtbGFzdGVsZnN0YW5kaW5nKDUpXG5wYXJ0MlxuYGBgIn0= -->
+<pre class="r"><code>
+part2&lt;-lastelfstanding(5)
 part2</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ4Mzg2OVxuIn0= -->
-<pre><code>[1] 483869</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDJcbiJ9 -->
+<pre><code>[1] 2</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxOCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KG51bWJlcnMpDQpsaWJyYXJ5KHJlc2hhcGUyKQ0Kb3B0aW9ucyhzY2lwZW4gPSA5OTkpDQpgYGANCg0KDQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCJEYXkxOFNhbXBsZTIudHh0IikNCmBgYA0KDQoNCmBgYHtyfQ0KdHJhcDwtbWF0cml4KCIuIixucm93PTEsbmNvbD1uY2hhcihpbnB1dCkrMikNCnRyYXBbMSwyOihuY29sKHRyYXApLTEpXTwtdW5saXN0KHN0cl9zcGxpdChpbnB1dCwiIikpDQpgYGANCg0KYGBge3J9DQp0cmFwZmluZGVyPC1mdW5jdGlvbih0cnAscndzKXsNCiAgZm9yKGkgaW4gMjpyd3Mpew0KICAgIHk8LWMoIi4iLA0KICAgICAgICAgc2FwcGx5KDI6KG5jb2wodHJwKS0xKSxmdW5jdGlvbih4KXtpZih0cnBbKGktMSksKHgtMSldPT10cnBbKGktMSksKHgrMSldKXsiLiJ9ZWxzZXsiXiJ9fSksDQogICAgICAgICAiLiIpDQogICAgdHJwPC1yYmluZCh0cnAseSl9DQogIHRycH0NCg0KYGBgDQoNCmBgYHtyfQ0KcDE8LXRyYXBmaW5kZXIodHJhcCwxMCkNCnAxPC1wMVssMjoobmNvbChwMSktMSldDQpwYXJ0MTwtbGVuZ3RoKHdoaWNoKHAxPT0iLiIpKQ0KcGFydDENCmBgYA0KDQoNCg0KYGBge3IsZWNobz1GQUxTRX0NCnJvdy5uYW1lcyhwMSk8LTE6MTANCmdyPC1tZWx0KHAxKQ0KDQpiYXNpY2dyYXBoPC1nZ3Bsb3QoZ3IsYWVzKHg9VmFyMix5PVZhcjEsY29sb3I9dmFsdWUsc2hhcGU9dmFsdWUpKSsNCiAgZ2VvbV9wb2ludCgpKw0KICB0aGVtZShheGlzLnRleHQueCA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgYXhpcy50aWNrcy54ID0gZWxlbWVudF9ibGFuaygpLA0KICAgICAgICBheGlzLnRpY2tzLnkgPSBlbGVtZW50X2JsYW5rKCksDQogICAgICAgIGF4aXMudGl0bGUueSA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgYXhpcy50aXRsZS54ID0gZWxlbWVudF9ibGFuaygpLA0KICAgICAgICBheGlzLnRleHQueSA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgcGFuZWwuZ3JpZC5tYWpvciA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgcGFuZWwuZ3JpZC5taW5vciA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgbGVnZW5kLnBvc2l0aW9uPSJub25lIikrDQogIHNjYWxlX3lfcmV2ZXJzZSgpKw0KICBjb29yZF9maXhlZCgpDQpiYXNpY2dyYXBoDQpgYGANCg0KIyMgUGFydCAyDQoNCkNvbWUgKHZlcnkgYmVsYXRlZGx5KSB0byB0aGUgcmVhbGl6YXRpb24gdGhhdCBpIGRvbid0IGFjdHVhbGx5IGhhdmUgdG8gc3RvcmUgdGhpcyAtIGp1c3QgY291bnQgdGhlIHNwYWNlczoNCg0KYGBge3J9DQpzcGFjZWZpbmRlcjwtZnVuY3Rpb24odHJwLHJ3cyl7DQogICMjc3RhcnQgd29ya2luZyB3aXRoIHRoZSBzdHJpbmcgaXRzZWxmLCBubyBtYXRyaXgNCiAgIyNjaGFuZ2UgaXQgaW50byBhIHZlY3Rvcg0KICB0cnA8LXVubGlzdChzdHJfc3BsaXQodHJwLCIiKSkNCiAgIyMgY291bnQgdGhlIHNwYWNlcw0KICBzcGM8LWxlbmd0aCh3aGljaCh0cnA9PSIuIikpDQogICMjIGFwcGVuZCBzcGFjZXMgdG8gZWFjaCBlZGdlIChiZWNhdXNlIEknbSBsYXp5KQ0KICB0cnA8LWMoIi4iLHRycCwiLiIpDQogIGZvcihpIGluIDI6cndzKXsNCiAgICAjIyBjcmVhdGUgYW5vdGhlciB2ZWN0b3IgYmFzZWQgb24gdGhlIGZpcnN0DQogICAgeTwtYygiLiIsDQogICAgICAgICBzYXBwbHkoMjoobGVuZ3RoKHRycCktMSksZnVuY3Rpb24oeCl7aWYodHJwWyh4LTEpXT09dHJwWyh4KzEpXSl7Ii4ifWVsc2V7Il4ifX0pLA0KICAgICAgICAgIi4iKQ0KICAgICMjIGNvdW50IHRoZSBzcGFjZXMgaW4gdGhhdCB2ZWN0b3IsIGFkZCB0byB0b3RhbCAoLTIgdG8gZGVhbCB3aXRoIHRoZSBleHRyYSBzcGFjZXMgYXQgdGhlIGVuZC4pDQogICAgc3BjPC1zcGMrbGVuZ3RoKHdoaWNoKHk9PSIuIikpLTINCiAgICAjIyBtb3ZlIHRoZSBuZXcgdmVjdG9yIHRvIHRoZSB3b3JraW5nIHZlY3RvciBzbG90IGFuZCByZXBlYXQNCiAgICB0cnA8LXl9DQogICMjIHJldHVybiB0aGUgbnVtYmVyIG9mIHNwYWNlcy4NCiAgc3BjfQ0KDQpgYGANCg0KDQpgYGB7cn0NCnNwYWNlZmluZGVyKGlucHV0LDEwKQ0KYGBgDQoNCmBgYHtyfQ0KcGFydDI8LXNwYWNlZmluZGVyKGlucHV0LDEwMDAwMCkNCnBhcnQyDQpgYGA=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxOSBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KG51bWJlcnMpDQpvcHRpb25zKHNjaXBlbiA9IDk5OSkNCmBgYA0KDQojIyBQYXJ0IDENCkkgdGhpbmsgSSBjYW4gZG8gdGhpcyBieSByZW1vdmluZyBldmVyeSBvdGhlciBlbGYgKGlmIHRoZXJlJ3MgYW4gZXZlbiBudW1iZXIgb2YgZWx2ZXMpIG9yIHJlbW92aW5nIGV2ZXJ5IG90aGVyIGVsZiAmIHRoZW4gcmVtb3ZpbmcgZmlyc3QgZWxmLCBpZiB0aGVyZSdzIGFuIG9kZCBudW1iZXIuDQoNCmBgYHtyfQ0KIyMjIHN0YXJ0IGJ5IGNyZWF0aW5nIHRoZSBlbHZlcw0KcGFydDE8LTE6NQ0KIyMjIHdoaWxlIHRoZXJlIGFyZSBzdGlsbCBlbHZlcyANCndoaWxlKGxlbmd0aChwYXJ0MSk+MSl7DQogICMjIyBpZiB0aGVyZSBhcmUgYW4gZXZlbiBudW1iZXIgb2YgZWx2ZXMsIHRoZW4gdGhlIGVsdmVzIGluIGFuICJvZGQiIHBvc2l0aW9uIChmaXJzdCwgdGhpcmQsIGZpZnRoLGV0Yy4pIHdpbGwgZ2V0IHRvIHN0ZWFsDQogICMjIyB0aGUgZWx2ZXMgaW4gYW4gImV2ZW4iIHBvc2l0aW9uIHdpbGwgYmUga2lja2VkIG91dA0KICBpZihsZW5ndGgocGFydDEpJSUyPT0wKXtwYXJ0MTwtcGFydDFbYyhUUlVFLEZBTFNFKV0NCiAgIyMjIGlmIHRoZXJlIGFyZSBhbiBvZGQgbnVtYmVyIG9mIGVsdmVzLCB0aGUgZWx2ZXMgaW4gYW4gIm9kZCIgcG9zaXRpb24gd2lsbCBzdGVhbCwNCiAgIyMjIHRoZSBlbHZlcyBpbiBhbiBldmVuIHBvc2l0aW9uIHdpbGwgYmUga2lja2VkIG91dA0KICAjIyMgYW5kIHRoZSBmaW5hbCAib2RkIiBlbGYgd2lsbCBzdGVhbCB0aGUgZmlyc3QgZWxmIC0gc2V0dGluZyB1cCBmb3IgYSBuZXcgcm91bmQuDQogIH1lbHNle3BhcnQxPC1wYXJ0MVtjKFRSVUUsRkFMU0UpXQ0KICBwYXJ0MTwtcGFydDFbLTFdfX0NCnBhcnQxDQpgYGANCg0KIyMgUGFydCAyDQpTdGFydCBieSBjcmVhdGluZyB0aGUgZWx2ZXMNCmFuZCBhIHBvaW50ZXIgdG8gc2hvdyB3aGljaCBlbGYgaXMgdGhlIG9uZSBkb2luZyB0aGUgdGhlaXZpbmcuDQppZiB0aGVyZSBhcmUgYW4gZXZlbiBudW1iZXIgb2YgZWx2ZXMsIHJlbW92ZSB0aGUgZWxmIGhhbGZ3YXkgYXJvdW5kIHRoZSBjaXJjbGUuDQppZiB0aGVyZSBhbiBvZGQgbnVtYmVyIG9mIGVsdmVzLCByZW1vdmUgdGhlIGVsZiBoYWxmd2F5IChyb3VuZCBkb3duKQ0KaW5jcmVhc2UgdGhlIHBvaW50ZXINCmBgYHtyfQ0KcGFydDI8LTE6MjANCg0Kc2xvd3AyPC1mdW5jdGlvbih4KXsNCiAgeDwtMTp4DQogIGk8LTENCiAgd2hpbGUobGVuZ3RoKHgpPjEpew0KICAgICMjIyB0aGUgb25lIHRvIHJlbW92ZSBpcyBoYWxmIG9mIHRoZSBjaXJjbGUgYXdheSAtIG1vZCBieSB0aGUgbGVuZ3RoIG9mIHRoZSBjaXJjbGUgaWYgeW91IGNvaWwgYXJvdW5kIHRvIHRoZSBiZWdpbm5pbmcNCiAgICBybXY8LWZsb29yKGkrKGxlbmd0aCh4KS8yKSklJWxlbmd0aCh4KQ0KICAgICMjIyBhbmQgYmVjYXVzZSAxIGluZGV4ZWQsIHVzZSBsZW5ndGggb2YgdGhlIGNpcmNsZSBpbnN0ZWFkIG9mIDANCiAgICBpZihybXY9PTApe3JtdjwtbGVuZ3RoKHgpfQ0KICAgICNjYXQoImNpcmNsZTogIixsZW5ndGgoeCksIiBlbGY6ICIseFtpXSwiYXQ6ICIsaSwiIHJvYmJlZDogIix4W3Jtdl0sIiBhdDogIixybXYsIlxuIikNCiAgICAjY2F0KCIqKioqKioqIixwYXN0ZShwYXJ0MiksIlxuIikNCiAgICAjIyMgcmVtb3ZlIHRoYXQgZWxmDQogICAgeDwteFstcm12XQ0KICAgICMjIGlmIHRoZSBlbGYgcmVtb3ZlZCBoYXMgYSBsb3dlciBudW1iZXIgdGhhbiB0aGUgZWxmIHdobyBzdG9sZQ0KICAgICMjIHRoZW4gZXZlcnlvbmUgd2lsbCBtb3ZlIHVwIGEgcG9zaXRpb24gYW5kIHlvdSAqZG9uJ3QqIGluY3JlYXNlDQogICAgIyMgdGhlIGluZGV4IHRvIGdldCB0byB0aGUgbmV4dCBlbGYuDQogICAgIyMgb3RoZXJ3aXNlLCBpbmNyZWFzZSB0aGUgaW5kZXguDQogICAgaWYocm12Pmkpe2k8LWkrMX0NCiAgICBpZihpPmxlbmd0aCh4KSl7aTwtMX0NCiAgICANCiAgICAjICBpZihpPT0xKXtjYXQocGFzdGUoeCksIlxuIil9DQogIH0NCiAgeH0NCmBgYA0KVGhpcyB0YWtlcyBmb3JldmVyLg0KDQpUaGVyZSdzIGEgcGF0dGVybiBhcyB0byB3aGljaCBlbHZlcyBhcmUgbGVmdCBhdCB0aGUgZW5kIG9mIGV2ZXJ5IHJvdW5kLCBpdCBpcyBkZXBlbmRlbnQgb24gaG93IG1hbnkgZWx2ZXMgdGhlcmUgYXJlIGF0IHRoZSBiZWdpbm5pbmctIA0KDQpgYGB7cn0NCmxhc3RlbGZzdGFuZGluZzwtZnVuY3Rpb24oeCl7DQogIHg8LTE6eA0KICBseDwtbGVuZ3RoKHgpDQogIHdoaWxlKGx4PjEpew0KICAgICMjIyB0aGUgbnVtYmVyIG9mIGVsdmVzIGlzIGEgbXVsdGlwbGUgb2YgMw0KICAgIGlmKGx4JSUzPT0wKXt4PC14W2MoRkFMU0UsRkFMU0UsVFJVRSldDQogICAgfWVsc2V7DQogICAgICAjIyMgNCBjYXNlcw0KICAgICAgIyMjIGV2ZW4gbnVtYmVyIG9mIGVsdmVzIGFuZCBlbHZlcyBNT0QgMyBpcyAyDQogICAgICBpZihseCUlMz09MiYmbHglJTI9PTApew0KICAgICAgICB4PC1jKHhbMToobHgvMildW2MoRixULEYpXSx4WyhseC8yKTpseF1bYyhULEYsRildKQ0KICAgICAgICBpZihhbnkoaXMubmEoeCkpKXt4PC14Wy0od2hpY2goaXMubmEoeCkpKV19DQogICAgICAgICMjI29kZCBudW1iZXIgb2YgZWx2ZXMgYW5kIGVsdmVzIE1PRCAzIGlzIDINCiAgICAgIH1lbHNlIGlmKGx4JSUzPT0yJiZseCUlMj09MSl7DQogICAgICAgIHg8LWMoeFsxOmZsb29yKGx4LzIpXVtjKEYsVCxGKV0seFtjZWlsaW5nKGx4LzIpOmx4XVtjKEYsVCxGKV0pDQogICAgICAgICMgICAgY2F0KHgsIlxuIikNCiAgICAgICAgaWYoYW55KGlzLm5hKHgpKSl7eDwteFstKHdoaWNoKGlzLm5hKHgpKSldfQ0KICAgICAgICAjIyNldmVuIG51bWJlciBvZiBlbHZlcyBhbmQgZWx2ZXMgTU9EIDMgaXMgMQ0KICAgICAgfWVsc2UgaWYobHglJTM9PTEmJmx4JSUyPT0wKXsNCiAgICAgICAgeDwtYyh4WzE6KGx4LzIpXVtjKFQsRixGKV0seFsobHgvMik6bHhdW2MoVCxGLEYpXSkNCiAgICAgICAgaWYoYW55KGlzLm5hKHgpKSl7eDwteFstKHdoaWNoKGlzLm5hKHgpKSldfQ0KICAgICAgICAjIyNvZGQgbnVtYmVyIG9mIGVsdmVzIGFuZCBlbHZlcyBNT0QgMyBpcyAxDQogICAgICB9ZWxzZSBpZihseCUlMz09MSYmbHglJTI9PTEpew0KICAgICAgICB4PC1jKHhbMTpmbG9vcihseC8yKV1bYyhULEYsRildLHhbZmxvb3IobHgvMildLHhbY2VpbGluZyhseC8yKTpseF1bYyhGLFQsRildKQ0KICAgICAgICBpZihhbnkoaXMubmEoeCkpKXt4PC14Wy0od2hpY2goaXMubmEoeCkpKV19DQogICAgICB9ZWxzZXtjYXQoInNvbWV0aGluZyB3ZW50IHdyb25nIil9fQ0KICAgIGx4PC1sZW5ndGgoeCl9DQogIHh9DQpgYGANCg0KYGBge3J9DQoNCnBhcnQyPC1sYXN0ZWxmc3RhbmRpbmcoNSkNCnBhcnQyDQpgYGANCg==</div>
 
 
 
@@ -1902,7 +1915,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Day18.Rmd");
+  window.initializeSourceEmbed("Day19.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

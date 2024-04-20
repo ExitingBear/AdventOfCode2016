@@ -18,18 +18,60 @@ library(numbers)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+
+
+```{r}
+input<-read_lines("Day20Sample.txt")
+```
+
+## Part 1
+
+First, change this into a list of vectors and sort them - 
+```{r}
+blacklist<-lapply(input,function(x){as.numeric(unlist(str_split(x,"-")))})
+blorder<-sapply(blacklist,function(x)x[[1]])
+blacklist<-blacklist[order(blorder)]
+```
+
+
+Then go through and combine the ranges
+
+```{r}
+smalllist<-list()
+x<-blacklist[[1]]
+for(i in 2:length(blacklist)){
+y<-blacklist[[i]]
+### if the old range overlaps the new range or the new range is right next to the old range (no gaps)
+### then add the new range to the old range. and move to the next
+if(x[2]>=y[1]||x[2]+1==y[1]){x<-c(x[1],max(x[2],y[2]))
+### if there is a gap, put the old range into the list, make the new range the new old range, and move to the next
+}else{
+  smalllist<-c(smalllist,list(x))
+  x<-y}}
+### add the final range to the list of ranges
+smalllist<-c(smalllist,list(x))
+```
+
+There are a few other ways to do this (for example, the smallest had to be one more than one of the ranges - that means that it was possible to just get the numbers that were the upper end of the ranges, plus one, run them to see if any didn't fit into other ranges and the smallest would be part1.  But this makes part 2 very easy. )
+
+```{r}
+### part 1 is 1 more than the end of the smallest range
+part1<-smalllist[[1]][2]+1
+part1
+```
+
+
+## Part 2
+Add up the distance between ranges.  (My real input stretches from the lower to upper limit, so there's no reason to account for it.  But do that if it doesn't.)
+
+```{r}
+
+part2<-sapply(2:length(smalllist),function(i){
+  gap<-smalllist[[i]][1]-smalllist[[i-1]][2]-1
+gap})
+
+part2<-sum(part2)
+part2
+
 ```
 

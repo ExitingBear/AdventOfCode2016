@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 21 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,171 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+## Part 1
+
+```{r}
+input<-read_lines("Day21Sample.txt")
+```
+
+Make functions that just do these things, bring in a vector, spit out a vector:
+
+```{r}
+### switches two letters based on their position
+swapposition<-function(vec,x,y){
+### because 1 based, need to add 1 to x & y
+  x<-x+1
+  y<-y+1
+  z<-vec[x]
+  vec[x]<-vec[y]
+  vec[y]<-z
+  vec}
+
+### switches two letters based on their letter
+swapletter<-function(vec,x,y){
+  px<-which(vec==x)
+  py<-which(vec==y)
+  vec[px]<-y
+  vec[py]<-x
+  vec}
+
+### moves to the left
+rotateleft<-function(vec,x){
+  if(x!=0){
+    for(i in 1:x){
+      vec<-c(vec[-1],vec[1])}}
+  vec}
+
+### move to the right
+rotateright<-function(vec,x){
+  if(x!=0){
+    for(i in 1:x){
+      vec<-c(tail(vec,1),vec[-length(vec)])}}
+  vec}
+
+### rotate based on position of 
+rotatebased<-function(vec,x){
+  px<-which(vec==x)
+  ### because the instructions say to add 1, don't need to do that.
+  if(px>=5){px<-px+1}
+  ### rotate it that many times
+  for(i in 1:px){
+    vec<-c(tail(vec,1),vec[-length(vec)])}
+  vec}
+
+###reverse between
+reversexy<-function(vec,x,y){
+  x<-x+1
+  y<-y+1
+  vec[x:y]<-rev(vec[x:y])
+  vec}
+
+###move
+movexy<-function(vec,x,y){
+  x<-x+1
+  y<-y+1
+  z<-vec[x]
+  vec<-vec[-x]
+  if(y==1){vec<-c(z,vec)
+  }else if(y>length(vec)){vec<-c(vec,z)
+  }else(vec<-c(vec[1:y-1],z,vec[y:length(vec)]))
+  vec}
+
+```
+
+Then the function that runs them all
+
+```{r}
+scramble<-function(instructions=input,v="abcde"){
+  v<-unlist(str_split(v,""))
+  for(i in 1:length(instructions)){
+    inst<-unlist(str_split(instructions[i]," "))
+    cat(inst,"\t")
+    if(inst[1]=="swap"&&inst[2]=="position"){
+      v<-swapposition(v,as.numeric(inst[3]),as.numeric(inst[6]))
+    }else if(inst[1]=="swap"&&inst[2]=="letter"){
+      v<-swapletter(v,inst[3],inst[6])
+    }else if(inst[1]=="rotate"&&inst[2]=="right"){
+      v<-rotateright(v,as.numeric(inst[3]))
+    }else if(inst[1]=="rotate"&&inst[2]=="left"){
+      v<-rotateleft(v,as.numeric(inst[3]))
+    }else if(inst[1]=="rotate"&&inst[2]=="based"){
+      v<-rotatebased(v,inst[7])
+    }else if(inst[1]=="reverse"){
+      v<-reversexy(v,as.numeric(inst[3]),as.numeric(inst[5]))
+    }else if(inst[1]=="move"){
+      v<-movexy(v,as.numeric(inst[3]),as.numeric(inst[6]))
+    }else{cat("something went wrong\n")}
+  cat(v,"\n")}
+str_flatten(v)}
+```
+
+
+```{r}
+scramble()
+```
+
+
+##Part 2
+For the most part, it's just going to be switching minor things - swaps won't change, rotate the other way, move will go in reverse.  Rotate based on position will be slightly different - but it's mapped 1 to 1.  So, a reverse rotate function is needed.  This is very specific for 8 characters
+
+```{r}
+revrotate<-function(vec,x){
+    px<-which(vec==x)
+    switch(px,
+           "1"=vec<-c(tail(vec,7),head(vec,1)),
+           "2"=vec<-c(tail(vec,7),head(vec,1)),
+           "3"=vec<-c(tail(vec,2),head(vec,6)),
+           "4"=vec<-c(tail(vec,6),head(vec,2)),
+           "5"=vec<-c(tail(vec,1),head(vec,7)),
+           "6"=vec<-c(tail(vec,5),head(vec,3)),
+           "7"=vec<-vec,
+           "8"=vec<-c(tail(vec,4),head(vec,4)),
+           cat("something reversed wrong\n"))
+    vec}
+  
+```
+
+Then unscramble:
+
+
+```{r}
+unscramble<-function(instructions=input,v="abcde"){
+  v<-unlist(str_split(v,""))
+  for(i in length(instructions):1){
+    inst<-unlist(str_split(instructions[i]," "))
+    cat(inst,"\t")
+    ### swap position stays the same
+    if(inst[1]=="swap"&&inst[2]=="position"){
+      v<-swapposition(v,as.numeric(inst[3]),as.numeric(inst[6]))
+      ### swap letter stays the same
+    }else if(inst[1]=="swap"&&inst[2]=="letter"){
+      v<-swapletter(v,inst[3],inst[6])
+      ### if it says rotate right, rotate left
+    }else if(inst[1]=="rotate"&&inst[2]=="right"){
+      v<-rotateleft(v,as.numeric(inst[3]))
+      ### if it says rotate left, rotate right
+    }else if(inst[1]=="rotate"&&inst[2]=="left"){
+      v<-rotateright(v,as.numeric(inst[3]))
+      ### if it says "rotate based on" use the reverse rotate
+    }else if(inst[1]=="rotate"&&inst[2]=="based"){
+      v<-revrotate(v,inst[7])
+      ### reverse stays the same
+    }else if(inst[1]=="reverse"){
+      v<-reversexy(v,as.numeric(inst[3]),as.numeric(inst[5]))
+      ### move switches positions
+    }else if(inst[1]=="move"){
+      v<-movexy(v,as.numeric(inst[6]),as.numeric(inst[3]))
+    }else{cat("something went wrong\n")}
+  cat(v,"\n")}
+str_flatten(v)}
+```
+
+Because the reverse only works for 8 characters, not including with my input
+```{r,eval=FALSE}
+unscramble(input,"abcde")
 ```
 
