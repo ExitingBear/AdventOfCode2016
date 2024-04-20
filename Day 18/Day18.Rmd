@@ -10,14 +10,14 @@ library(stringr)
 library(tidyverse)
 library(ggplot2)
 library(readr)
-library(ds4psy)
 library(numbers)
+library(reshape2)
 options(scipen = 999)
 ```
 
 
 ```{r}
-input<-read_lines("Day18Sample.txt")
+input<-read_lines("Day18Sample2.txt")
 ```
 
 
@@ -29,34 +29,76 @@ trap[1,2:(ncol(trap)-1)]<-unlist(str_split(input,""))
 ```{r}
 trapfinder<-function(trp,rws){
   for(i in 2:rws){
-    trp[i,(2:ncol(trp)-1)]<-sapply((2:ncol(trp)-1),function(x){
-      if(trp[(i-1),(x-1)]==trp[(i-1),(x+1)]){"."}else{"^"}})}
+    y<-c(".",
+         sapply(2:(ncol(trp)-1),function(x){if(trp[(i-1),(x-1)]==trp[(i-1),(x+1)]){"."}else{"^"}}),
+         ".")
+    trp<-rbind(trp,y)}
   trp}
 
 ```
 
 ```{r}
-p1<-trapfinder(trap)
-p2<-p1[,2:(ncol(p1)-1)]
-part2<-length(which(p2=="."))
+p1<-trapfinder(trap,10)
+p1<-p1[,2:(ncol(p1)-1)]
+part1<-length(which(p1=="."))
 part1
 ```
 
 
 
-
 ```{r,echo=FALSE}
-basicgraph<-ggplot()+
+row.names(p1)<-1:10
+gr<-melt(p1)
+
+basicgraph<-ggplot(gr,aes(x=Var2,y=Var1,color=value,shape=value))+
+  geom_point()+
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
         axis.ticks.y = element_blank(),
         axis.title.y = element_blank(),
         axis.title.x = element_blank(),
+        axis.text.y = element_blank(),
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position="none")+
-  scale_y_reverse+
+  scale_y_reverse()+
   coord_fixed()
+basicgraph
 ```
 
+## Part 2
+
+Come (very belatedly) to the realization that i don't actually have to store this - just count the spaces:
+
+```{r}
+spacefinder<-function(trp,rws){
+  ##start working with the string itself, no matrix
+  ##change it into a vector
+  trp<-unlist(str_split(trp,""))
+  ## count the spaces
+  spc<-length(which(trp=="."))
+  ## append spaces to each edge (because I'm lazy)
+  trp<-c(".",trp,".")
+  for(i in 2:rws){
+    ## create another vector based on the first
+    y<-c(".",
+         sapply(2:(length(trp)-1),function(x){if(trp[(x-1)]==trp[(x+1)]){"."}else{"^"}}),
+         ".")
+    ## count the spaces in that vector, add to total (-2 to deal with the extra spaces at the end.)
+    spc<-spc+length(which(y=="."))-2
+    ## move the new vector to the working vector slot and repeat
+    trp<-y}
+  ## return the number of spaces.
+  spc}
+
+```
+
+
+```{r}
+spacefinder(input,10)
+```
+
+```{r}
+part2<-spacefinder(input,100000)
+part2
+```

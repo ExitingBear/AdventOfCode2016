@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 24 Notebook"
 output: html_notebook
 ---
 
@@ -15,21 +15,160 @@ library(ggraph)
 library(readr)
 library(ds4psy)
 library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+## Part 1
+
+First, find all of the numbers that need visiting
+
+```{r}
+input<-read_lines("Day24Sample.txt")
+hvacm<-matrix(ncol=nchar(input[1]),nrow=length(input))
+for(i in 1:length(input)){
+  hvacm[i,]<-unlist(str_split(input[i],""))}
+
+poi<-as.vector(hvacm[intersect(which(hvacm!="#"),which(hvacm!="."))])
 ```
 
+
+Then, find the distance between all of them.
+```{r}
+hvacdist<-function(hv,s,e){
+  beenthere<-dict()
+  pq<-priority_queue()
+  s<-as.vector(which(hv==s, arr.ind=TRUE))
+  e<-as.vector(which(hv==e, arr.ind=TRUE))
+  pq$push(c(s,0),pri=-sum(abs(s-e)))
+  while(pq$size()>0){
+    curr<-pq$pop()
+    ### if out of bounds, next
+    if(curr[1]<1||curr[2]<1||curr[1]>nrow(hv)||curr[2]>ncol(hv)){next}
+    ### if at end, return t
+    if(all(curr[1:2]==e)){return(curr[3])
+      break}
+    if(beenthere$has(curr[1:2])){next}
+    beenthere$set(curr[1:2],curr[3])
+    ### if it's a wall, next
+    if(hv[curr[1],curr[2]]=="#"){next}
+    ### up
+    n<-curr[1:2]+c(-1,0)
+    pri<-sum(abs(n-e))+curr[3]+1
+    pq$push(c(n,curr[3]+1),priority=-pri)
+    ### down
+    n<-curr[1:2]+c(1,0)
+    pri<-sum(abs(n-e))+curr[3]+1
+    pq$push(c(n,curr[3]+1),priority=-pri)
+    ### left
+    n<-curr[1:2]+c(0,-1)
+    pri<-sum(abs(n-e))+curr[3]+1
+    pq$push(c(n,curr[3]+1),priority=-pri)
+    ### right
+    n<-curr[1:2]+c(0,1)
+    pri<-sum(abs(n-e))+curr[3]+1
+    pq$push(c(n,curr[3]+1),priority=-pri)
+  }
+  list(beenthere,pq)}
+```
+
+
+Here are the df to show distances
+```{r}
+poidist<-as.data.frame(matrix(ncol=3,nrow=0))
+for(i in 1:length(poi)){
+  for(j in 1:length(poi)){
+    if(i!=j){
+      d<-hvacdist(hvacm,poi[i],poi[j])
+      poidist<-rbind(poidist,c(poi[i],poi[j],d))}}}
+colnames(poidist)<-c("strt","end","d")
+poidist$d<-as.numeric(poidist$d)
+```
+
+Which does not work
+
+So - bfs ... again.
+
+```{r}
+poibfs<-function(s,df){
+  pts<-unique(df$strt)
+  beenthere<-dict()
+  pq<-priority_queue()
+  ### push the path to this point & the distance to this point
+  pq$push(list(s,0),priority=0)
+  mindist<-min(df$d)
+  while(pq$size()>0){
+    curr<-pq$pop()
+    ### if have been to all spots, return
+    if(length(curr[[1]])==length(pts)){return(curr)}
+    ### otherwise, find path & distance
+    pth<-unlist(curr[-length(curr)])
+    st<-as.numeric(unlist(tail(curr,1)))
+    ### if been there, leave
+    if(beenthere$has(pth)){next}
+    beenthere$set(pth,st)
+    x<-df%>%rowwise%>%
+      filter(strt==tail(pth,1),!(end%in%pth))
+    ### find all next possible steps
+    for(i in 1:nrow(x)){
+      nrw<-x[i,]
+      nd<-nrw$d
+      npth<-c(pth,nrw$end)
+      pri<-st+nrw$d+(length(pts)-length(pth))*mindist
+      ### push  all of them to the pq
+      pq$push(list(npth,st+nrw$d),-pri)}}
+  ### if something goes wrong, send out the dict & the priority queue
+list(beenthere,pq)}
+```
+
+
+
+```{r}
+part1<-poibfs("0",poidist)
+cat(unlist(part1[[1]]),"\n")
+part1[[2]]
+```
+## Part 2
+Make another tiny change so that it circles back to 0
+
+```{r}
+poibfsback<-function(s,df){
+  ### same set up
+  pts<-unique(df$strt)
+  beenthere<-dict()
+  pq<-priority_queue()
+  pq$push(list(s,0),priority=0)
+  mindist<-min(df$d)
+  while(pq$size()>0){
+    ### pop the first place
+    curr<-pq$pop()
+    ### if you have been to everywhere and back, stop
+    if(length(curr[[1]])==length(pts)+1){
+        return(curr)}
+    pth<-unlist(curr[-length(curr)])
+    st<-as.numeric(unlist(tail(curr,1)))
+    ### if there before, next
+    if(beenthere$has(pth)){next}
+    ### if you've gone back too early, next
+    if("0" %in% pth[-1]){next}
+    beenthere$set(pth,st)
+    x<-df%>%rowwise%>%
+      filter(strt==tail(pth,1),!(end%in%pth[-1]))
+    ### find all next possible steps
+    for(i in 1:nrow(x)){
+      nrw<-x[i,]
+      nd<-nrw$d
+      npth<-c(pth,nrw$end)
+      pri<-st+nrw$d+(length(pts)-length(pth))*mindist
+      ### push  all of them to the pq
+      pq$push(list(npth,st+nrw$d),-pri)}}
+  list(beenthere,pq)}
+```
+
+
+
+```{r}
+part2<-poibfsback("0",poidist)
+cat(unlist(part2[[1]]),"\n")
+part2[[2]]
+```

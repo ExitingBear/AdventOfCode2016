@@ -11,7 +11,7 @@
 
 
 
-<title>Day 18 Notebook</title>
+<title>Day XX Notebook</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1746,7 +1746,7 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Day 18 Notebook</h1>
+<h1 class="title toc-ignore">Day XX Notebook</h1>
 
 </div>
 
@@ -1756,106 +1756,86 @@ display: none;
 <!-- rnb-text-begin -->
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkxOFNhbXBsZTIudHh0XCIpXG5gYGAifQ== -->
-<pre class="r"><code>input&lt;-read_lines(&quot;Day18Sample2.txt&quot;)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW5wdXQ8LXJlYWRfbGluZXMoXCJEYXkyMFNhbXBsZS50eHRcIilcbmBgYCJ9 -->
+<pre class="r"><code>input&lt;-read_lines(&quot;Day20Sample.txt&quot;)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<div id="part-1" class="section level2">
+<h2>Part 1</h2>
+<p>First, change this into a list of vectors and sort them -</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhcDwtbWF0cml4KFwiLlwiLG5yb3c9MSxuY29sPW5jaGFyKGlucHV0KSsyKVxudHJhcFsxLDI6KG5jb2wodHJhcCktMSldPC11bmxpc3Qoc3RyX3NwbGl0KGlucHV0LFwiXCIpKVxuYGBgIn0= -->
-<pre class="r"><code>trap&lt;-matrix(&quot;.&quot;,nrow=1,ncol=nchar(input)+2)
-trap[1,2:(ncol(trap)-1)]&lt;-unlist(str_split(input,&quot;&quot;))</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYmxhY2tsaXN0PC1sYXBwbHkoaW5wdXQsZnVuY3Rpb24oeCl7YXMubnVtZXJpYyh1bmxpc3Qoc3RyX3NwbGl0KHgsXCItXCIpKSl9KVxuYmxvcmRlcjwtc2FwcGx5KGJsYWNrbGlzdCxmdW5jdGlvbih4KXhbWzFdXSlcbmJsYWNrbGlzdDwtYmxhY2tsaXN0W29yZGVyKGJsb3JkZXIpXVxuYGBgIn0= -->
+<pre class="r"><code>blacklist&lt;-lapply(input,function(x){as.numeric(unlist(str_split(x,&quot;-&quot;)))})
+blorder&lt;-sapply(blacklist,function(x)x[[1]])
+blacklist&lt;-blacklist[order(blorder)]</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>Then go through and combine the ranges</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxudHJhcGZpbmRlcjwtZnVuY3Rpb24odHJwLHJ3cyl7XG4gIGZvcihpIGluIDI6cndzKXtcbiAgICB5PC1jKFwiLlwiLFxuICAgICAgICAgc2FwcGx5KDI6KG5jb2wodHJwKS0xKSxmdW5jdGlvbih4KXtpZih0cnBbKGktMSksKHgtMSldPT10cnBbKGktMSksKHgrMSldKXtcIi5cIn1lbHNle1wiXlwifX0pLFxuICAgICAgICAgXCIuXCIpXG4gICAgdHJwPC1yYmluZCh0cnAseSl9XG4gIHRycH1cblxuYGBgIn0= -->
-<pre class="r"><code>trapfinder&lt;-function(trp,rws){
-  for(i in 2:rws){
-    y&lt;-c(&quot;.&quot;,
-         sapply(2:(ncol(trp)-1),function(x){if(trp[(i-1),(x-1)]==trp[(i-1),(x+1)]){&quot;.&quot;}else{&quot;^&quot;}}),
-         &quot;.&quot;)
-    trp&lt;-rbind(trp,y)}
-  trp}
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc21hbGxsaXN0PC1saXN0KClcbng8LWJsYWNrbGlzdFtbMV1dXG5mb3IoaSBpbiAyOmxlbmd0aChibGFja2xpc3QpKXtcbnk8LWJsYWNrbGlzdFtbaV1dXG4jIyMgaWYgdGhlIG9sZCByYW5nZSBvdmVybGFwcyB0aGUgbmV3IHJhbmdlIG9yIHRoZSBuZXcgcmFuZ2UgaXMgcmlnaHQgbmV4dCB0byB0aGUgb2xkIHJhbmdlIChubyBnYXBzKVxuIyMjIHRoZW4gYWRkIHRoZSBuZXcgcmFuZ2UgdG8gdGhlIG9sZCByYW5nZS4gYW5kIG1vdmUgdG8gdGhlIG5leHRcbmlmKHhbMl0+PXlbMV18fHhbMl0rMT09eVsxXSl7eDwtYyh4WzFdLG1heCh4WzJdLHlbMl0pKVxuIyMjIGlmIHRoZXJlIGlzIGEgZ2FwLCBwdXQgdGhlIG9sZCByYW5nZSBpbnRvIHRoZSBsaXN0LCBtYWtlIHRoZSBuZXcgcmFuZ2UgdGhlIG5ldyBvbGQgcmFuZ2UsIGFuZCBtb3ZlIHRvIHRoZSBuZXh0XG59ZWxzZXtcbiAgc21hbGxsaXN0PC1jKHNtYWxsbGlzdCxsaXN0KHgpKVxuICB4PC15fX1cbiMjIyBhZGQgdGhlIGZpbmFsIHJhbmdlIHRvIHRoZSBsaXN0IG9mIHJhbmdlc1xuc21hbGxsaXN0PC1jKHNtYWxsbGlzdCxsaXN0KHgpKVxuYGBgIn0= -->
+<pre class="r"><code>smalllist&lt;-list()
+x&lt;-blacklist[[1]]
+for(i in 2:length(blacklist)){
+y&lt;-blacklist[[i]]
+### if the old range overlaps the new range or the new range is right next to the old range (no gaps)
+### then add the new range to the old range. and move to the next
+if(x[2]&gt;=y[1]||x[2]+1==y[1]){x&lt;-c(x[1],max(x[2],y[2]))
+### if there is a gap, put the old range into the list, make the new range the new old range, and move to the next
+}else{
+  smalllist&lt;-c(smalllist,list(x))
+  x&lt;-y}}
+### add the final range to the list of ranges
+smalllist&lt;-c(smalllist,list(x))</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
+<p>There are a few other ways to do this (for example, the smallest had
+to be one more than one of the ranges - that means that it was possible
+to just get the numbers that were the upper end of the ranges, plus one,
+run them to see if any didn’t fit into other ranges and the smallest
+would be part1. But this makes part 2 very easy. )</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucDE8LXRyYXBmaW5kZXIodHJhcCwxMClcbnAxPC1wMVssMjoobmNvbChwMSktMSldXG5wYXJ0MTwtbGVuZ3RoKHdoaWNoKHAxPT1cIi5cIikpXG5wYXJ0MVxuYGBgIn0= -->
-<pre class="r"><code>p1&lt;-trapfinder(trap,10)
-p1&lt;-p1[,2:(ncol(p1)-1)]
-part1&lt;-length(which(p1==&quot;.&quot;))
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuIyMjIHBhcnQgMSBpcyAxIG1vcmUgdGhhbiB0aGUgZW5kIG9mIHRoZSBzbWFsbGVzdCByYW5nZVxucGFydDE8LXNtYWxsbGlzdFtbMV1dWzJdKzFcbnBhcnQxXG5gYGAifQ== -->
+<pre class="r"><code>### part 1 is 1 more than the end of the smallest range
+part1&lt;-smalllist[[1]][2]+1
 part1</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM4XG4ifQ== -->
-<pre><code>[1] 38</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDNcbiJ9 -->
+<pre><code>[1] 3</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-plot-begin eyJoZWlnaHQiOjQzMi42MzI5LCJ3aWR0aCI6NzAwLCJzaXplX2JlaGF2aW9yIjowLCJjb25kaXRpb25zIjpbXX0= -->
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAnUAAAGFCAMAAACsU/XiAAAADFBMVEUAv8Tr6+v4dm3///+pEUAzAAAACXBIWXMAAA05AAANOQGumz/oAAAJo0lEQVR4nO2cwW7kwBHFnM3//3PutoMpaGuaPUvyaAhqjUgYOr2v/0ac5ot+gBBSdXGeqovzVF2cp+riPHx1/4nzwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgns/GOr+1q86s5bja56eCvY+X3V/fnzZ/IeZ04mVy0eePzZv4ZXff8L7Py66v78Gakbve6vyVWLB24++/gXProV7PxDqxv1tFnd6VvNrvoaX/XtT7DzD67u5ev+Gl21eODirTZ/4S8Xwc6vq274bbTI4oHHn/0psPP7qosDwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgnsvOqUwM6rTgns/MLqNtfVF4fTFzn+VK1hf+fHG1odHx9cNRvYHF013WBf23N/eiDs/J+ubnHCenTV5gb7ew+EnV9X3fGt6OPVzX7hew+EnV9X3XHO/68b8d4DYedVd/67bsZbD4SdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdX1jdaKF8OBc4utfigZ/y7LDz+6rb24qeb2ZvHfgxzw47/6erG81OHz9wubpHB8LOr6tucaF8tsF+/MDFpfbHB8LOr6tuyObu9OkDL3h22PmnVhd/Bey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzqtOCey86pTAzv/x6vYWpc+z+Ow/roKd31fdbMlyOIk+kTK6aHYg8OzPfiHs/LrqZqu9d65hbz774gb7L1fBzqtulubx6sbP/ugXws7/5eqOb7BvV7e0wf7LRbDz66pb/TZa5Ph33VuBnd9XXRwAdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnVacEdl51SmDnH1vdw/HxN99qBn8g7Py+6qYL5WsT5Yu3Ov7sTw+EnV9X3fJC+dHqNp/9vQfCzj+0uvduRT+9avHZ33wg7PxDq7uT48/++EDY+XXV3bBQ/pg7l+F/AXZ+X3VxANh51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnVedEth51SmBnV9Y3eJC+WhUcLg8ODlw8VabB/68CnZ+X3W7C+WvrSxOWF+6hv3LVbDzqqu681xX3eJC+WZ1n7zBXnU/efnS/oLN77q18zbpu+4h75ARL4CdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2HnVKYGdV50S2PmF1S2uYc+umt1qEf7ZYef3VTca7d28anarxdnP1Wd/ttQOO7+xurXXPRoAvnNYe/4LX1/ULvFPfr7HzZ5ms9Ovb7U8rP36wPeOgsPOr6xu6XV/za96eeDpOffNX1h1P3n5/u/g9Jz7Jn3X/QDxYAd2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOdVpwR2XnVKYOcXVrc3Tj1dp54cuDmJvvgLHx4IO7+vur2Z4Pli6+sDF8epN3/h0wNh51X3yaPvjw+EnV9X3eI49eyqT57ffnwg7Py66oZsftfdyVufHXb+qdXFXwE7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOPre74hPUiiwe2hv2M7y9kuD0+62m2ODy51eixNp99dK/ppvL3v8DOr6tutjh85zj15rO3wf5Wnr7trepmt1qsbvHA+ZL3tz/Bzj+4uvsm0RefvQ329/LL636pBGDxu27xwKfAzu+rLg4AO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzqlMCO686JbDzC6tbXFef8e/PubeG/Z0fb2hvXX26Y7524GycerbC2Qb7O3n6IvEd8/c+VRvsb+XnG1rb9B8vSi8duLhz3Qb7e3n8Ijd3zHcOnE2ib1fXBvsDXr7/v+DOPffF77qnwM7/7eri/wA7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsPOqUwI7rzolsHO+uvBRdXGeqovzVF2cp+riPFUX56m6OE/VxXmqLs5TdXGe/wH2+PRyYByjhwAAAABJRU5ErkJggg==" /></p>
-<!-- rnb-plot-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
+</div>
 <div id="part-2" class="section level2">
 <h2>Part 2</h2>
-<p>Come (very belatedly) to the realization that i don’t actually have
-to store this - just count the spaces:</p>
+<p>Add up the distance between ranges. (My real input stretches from the
+lower to upper limit, so there’s no reason to account for it. But do
+that if it doesn’t.)</p>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BhY2VmaW5kZXI8LWZ1bmN0aW9uKHRycCxyd3Mpe1xuICAjI3N0YXJ0IHdvcmtpbmcgd2l0aCB0aGUgc3RyaW5nIGl0c2VsZiwgbm8gbWF0cml4XG4gICMjY2hhbmdlIGl0IGludG8gYSB2ZWN0b3JcbiAgdHJwPC11bmxpc3Qoc3RyX3NwbGl0KHRycCxcIlwiKSlcbiAgIyMgY291bnQgdGhlIHNwYWNlc1xuICBzcGM8LWxlbmd0aCh3aGljaCh0cnA9PVwiLlwiKSlcbiAgIyMgYXBwZW5kIHNwYWNlcyB0byBlYWNoIGVkZ2UgKGJlY2F1c2UgSSdtIGxhenkpXG4gIHRycDwtYyhcIi5cIix0cnAsXCIuXCIpXG4gIGZvcihpIGluIDI6cndzKXtcbiAgICAjIyBjcmVhdGUgYW5vdGhlciB2ZWN0b3IgYmFzZWQgb24gdGhlIGZpcnN0XG4gICAgeTwtYyhcIi5cIixcbiAgICAgICAgIHNhcHBseSgyOihsZW5ndGgodHJwKS0xKSxmdW5jdGlvbih4KXtpZih0cnBbKHgtMSldPT10cnBbKHgrMSldKXtcIi5cIn1lbHNle1wiXlwifX0pLFxuICAgICAgICAgXCIuXCIpXG4gICAgIyMgY291bnQgdGhlIHNwYWNlcyBpbiB0aGF0IHZlY3RvciwgYWRkIHRvIHRvdGFsICgtMiB0byBkZWFsIHdpdGggdGhlIGV4dHJhIHNwYWNlcyBhdCB0aGUgZW5kLilcbiAgICBzcGM8LXNwYytsZW5ndGgod2hpY2goeT09XCIuXCIpKS0yXG4gICAgIyMgbW92ZSB0aGUgbmV3IHZlY3RvciB0byB0aGUgd29ya2luZyB2ZWN0b3Igc2xvdCBhbmQgcmVwZWF0XG4gICAgdHJwPC15fVxuICAjIyByZXR1cm4gdGhlIG51bWJlciBvZiBzcGFjZXMuXG4gIHNwY31cblxuYGBgIn0= -->
-<pre class="r"><code>spacefinder&lt;-function(trp,rws){
-  ##start working with the string itself, no matrix
-  ##change it into a vector
-  trp&lt;-unlist(str_split(trp,&quot;&quot;))
-  ## count the spaces
-  spc&lt;-length(which(trp==&quot;.&quot;))
-  ## append spaces to each edge (because I&#39;m lazy)
-  trp&lt;-c(&quot;.&quot;,trp,&quot;.&quot;)
-  for(i in 2:rws){
-    ## create another vector based on the first
-    y&lt;-c(&quot;.&quot;,
-         sapply(2:(length(trp)-1),function(x){if(trp[(x-1)]==trp[(x+1)]){&quot;.&quot;}else{&quot;^&quot;}}),
-         &quot;.&quot;)
-    ## count the spaces in that vector, add to total (-2 to deal with the extra spaces at the end.)
-    spc&lt;-spc+length(which(y==&quot;.&quot;))-2
-    ## move the new vector to the working vector slot and repeat
-    trp&lt;-y}
-  ## return the number of spaces.
-  spc}
-</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3BhY2VmaW5kZXIoaW5wdXQsMTApXG5gYGAifQ== -->
-<pre class="r"><code>spacefinder(input,10)</code></pre>
-<!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDM4XG4ifQ== -->
-<pre><code>[1] 38</code></pre>
-<!-- rnb-output-end -->
-<!-- rnb-chunk-end -->
-<!-- rnb-text-begin -->
-<!-- rnb-text-end -->
-<!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucGFydDI8LXNwYWNlZmluZGVyKGlucHV0LDEwMDAwMClcbnBhcnQyXG5gYGAifQ== -->
-<pre class="r"><code>part2&lt;-spacefinder(input,100000)
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuXG5wYXJ0Mjwtc2FwcGx5KDI6bGVuZ3RoKHNtYWxsbGlzdCksZnVuY3Rpb24oaSl7XG4gIGdhcDwtc21hbGxsaXN0W1tpXV1bMV0tc21hbGxsaXN0W1tpLTFdXVsyXS0xXG5nYXB9KVxuXG5wYXJ0Mjwtc3VtKHBhcnQyKVxucGFydDJcbmBgYCJ9 -->
+<pre class="r"><code>
+part2&lt;-sapply(2:length(smalllist),function(i){
+  gap&lt;-smalllist[[i]][1]-smalllist[[i-1]][2]-1
+gap})
+
+part2&lt;-sum(part2)
 part2</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDQ4Mzg2OVxuIn0= -->
-<pre><code>[1] 483869</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiWzFdIDFcbiJ9 -->
+<pre><code>[1] 1</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+<!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSAxOCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoZ2dwbG90MikNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KG51bWJlcnMpDQpsaWJyYXJ5KHJlc2hhcGUyKQ0Kb3B0aW9ucyhzY2lwZW4gPSA5OTkpDQpgYGANCg0KDQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCJEYXkxOFNhbXBsZTIudHh0IikNCmBgYA0KDQoNCmBgYHtyfQ0KdHJhcDwtbWF0cml4KCIuIixucm93PTEsbmNvbD1uY2hhcihpbnB1dCkrMikNCnRyYXBbMSwyOihuY29sKHRyYXApLTEpXTwtdW5saXN0KHN0cl9zcGxpdChpbnB1dCwiIikpDQpgYGANCg0KYGBge3J9DQp0cmFwZmluZGVyPC1mdW5jdGlvbih0cnAscndzKXsNCiAgZm9yKGkgaW4gMjpyd3Mpew0KICAgIHk8LWMoIi4iLA0KICAgICAgICAgc2FwcGx5KDI6KG5jb2wodHJwKS0xKSxmdW5jdGlvbih4KXtpZih0cnBbKGktMSksKHgtMSldPT10cnBbKGktMSksKHgrMSldKXsiLiJ9ZWxzZXsiXiJ9fSksDQogICAgICAgICAiLiIpDQogICAgdHJwPC1yYmluZCh0cnAseSl9DQogIHRycH0NCg0KYGBgDQoNCmBgYHtyfQ0KcDE8LXRyYXBmaW5kZXIodHJhcCwxMCkNCnAxPC1wMVssMjoobmNvbChwMSktMSldDQpwYXJ0MTwtbGVuZ3RoKHdoaWNoKHAxPT0iLiIpKQ0KcGFydDENCmBgYA0KDQoNCg0KYGBge3IsZWNobz1GQUxTRX0NCnJvdy5uYW1lcyhwMSk8LTE6MTANCmdyPC1tZWx0KHAxKQ0KDQpiYXNpY2dyYXBoPC1nZ3Bsb3QoZ3IsYWVzKHg9VmFyMix5PVZhcjEsY29sb3I9dmFsdWUsc2hhcGU9dmFsdWUpKSsNCiAgZ2VvbV9wb2ludCgpKw0KICB0aGVtZShheGlzLnRleHQueCA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgYXhpcy50aWNrcy54ID0gZWxlbWVudF9ibGFuaygpLA0KICAgICAgICBheGlzLnRpY2tzLnkgPSBlbGVtZW50X2JsYW5rKCksDQogICAgICAgIGF4aXMudGl0bGUueSA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgYXhpcy50aXRsZS54ID0gZWxlbWVudF9ibGFuaygpLA0KICAgICAgICBheGlzLnRleHQueSA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgcGFuZWwuZ3JpZC5tYWpvciA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgcGFuZWwuZ3JpZC5taW5vciA9IGVsZW1lbnRfYmxhbmsoKSwNCiAgICAgICAgbGVnZW5kLnBvc2l0aW9uPSJub25lIikrDQogIHNjYWxlX3lfcmV2ZXJzZSgpKw0KICBjb29yZF9maXhlZCgpDQpiYXNpY2dyYXBoDQpgYGANCg0KIyMgUGFydCAyDQoNCkNvbWUgKHZlcnkgYmVsYXRlZGx5KSB0byB0aGUgcmVhbGl6YXRpb24gdGhhdCBpIGRvbid0IGFjdHVhbGx5IGhhdmUgdG8gc3RvcmUgdGhpcyAtIGp1c3QgY291bnQgdGhlIHNwYWNlczoNCg0KYGBge3J9DQpzcGFjZWZpbmRlcjwtZnVuY3Rpb24odHJwLHJ3cyl7DQogICMjc3RhcnQgd29ya2luZyB3aXRoIHRoZSBzdHJpbmcgaXRzZWxmLCBubyBtYXRyaXgNCiAgIyNjaGFuZ2UgaXQgaW50byBhIHZlY3Rvcg0KICB0cnA8LXVubGlzdChzdHJfc3BsaXQodHJwLCIiKSkNCiAgIyMgY291bnQgdGhlIHNwYWNlcw0KICBzcGM8LWxlbmd0aCh3aGljaCh0cnA9PSIuIikpDQogICMjIGFwcGVuZCBzcGFjZXMgdG8gZWFjaCBlZGdlIChiZWNhdXNlIEknbSBsYXp5KQ0KICB0cnA8LWMoIi4iLHRycCwiLiIpDQogIGZvcihpIGluIDI6cndzKXsNCiAgICAjIyBjcmVhdGUgYW5vdGhlciB2ZWN0b3IgYmFzZWQgb24gdGhlIGZpcnN0DQogICAgeTwtYygiLiIsDQogICAgICAgICBzYXBwbHkoMjoobGVuZ3RoKHRycCktMSksZnVuY3Rpb24oeCl7aWYodHJwWyh4LTEpXT09dHJwWyh4KzEpXSl7Ii4ifWVsc2V7Il4ifX0pLA0KICAgICAgICAgIi4iKQ0KICAgICMjIGNvdW50IHRoZSBzcGFjZXMgaW4gdGhhdCB2ZWN0b3IsIGFkZCB0byB0b3RhbCAoLTIgdG8gZGVhbCB3aXRoIHRoZSBleHRyYSBzcGFjZXMgYXQgdGhlIGVuZC4pDQogICAgc3BjPC1zcGMrbGVuZ3RoKHdoaWNoKHk9PSIuIikpLTINCiAgICAjIyBtb3ZlIHRoZSBuZXcgdmVjdG9yIHRvIHRoZSB3b3JraW5nIHZlY3RvciBzbG90IGFuZCByZXBlYXQNCiAgICB0cnA8LXl9DQogICMjIHJldHVybiB0aGUgbnVtYmVyIG9mIHNwYWNlcy4NCiAgc3BjfQ0KDQpgYGANCg0KDQpgYGB7cn0NCnNwYWNlZmluZGVyKGlucHV0LDEwKQ0KYGBgDQoNCmBgYHtyfQ0KcGFydDI8LXNwYWNlZmluZGVyKGlucHV0LDEwMDAwMCkNCnBhcnQyDQpgYGA=</div>
+<div id="rmd-source-code">LS0tDQp0aXRsZTogIkRheSBYWCBOb3RlYm9vayINCm91dHB1dDogaHRtbF9ub3RlYm9vaw0KLS0tDQoNCmBgYHtyIHNldHVwLCBpbmNsdWRlPUZBTFNFfQ0KbGlicmFyeShrbml0cikNCmxpYnJhcnkoZHBseXIpDQpsaWJyYXJ5KHN0cmluZ3IpDQpsaWJyYXJ5KHRpZHl2ZXJzZSkNCmxpYnJhcnkoaWdyYXBoKQ0KbGlicmFyeShnZ3Bsb3QyKQ0KbGlicmFyeShyZ2wpDQpsaWJyYXJ5KGdncmFwaCkNCmxpYnJhcnkocmVhZHIpDQpsaWJyYXJ5KGRzNHBzeSkNCmxpYnJhcnkobnVtYmVycykNCm9wdGlvbnMoc2NpcGVuID0gOTk5KQ0KYGBgDQoNCg0KDQpgYGB7cn0NCmlucHV0PC1yZWFkX2xpbmVzKCJEYXkyMFNhbXBsZS50eHQiKQ0KYGBgDQoNCiMjIFBhcnQgMQ0KDQpGaXJzdCwgY2hhbmdlIHRoaXMgaW50byBhIGxpc3Qgb2YgdmVjdG9ycyBhbmQgc29ydCB0aGVtIC0gDQpgYGB7cn0NCmJsYWNrbGlzdDwtbGFwcGx5KGlucHV0LGZ1bmN0aW9uKHgpe2FzLm51bWVyaWModW5saXN0KHN0cl9zcGxpdCh4LCItIikpKX0pDQpibG9yZGVyPC1zYXBwbHkoYmxhY2tsaXN0LGZ1bmN0aW9uKHgpeFtbMV1dKQ0KYmxhY2tsaXN0PC1ibGFja2xpc3Rbb3JkZXIoYmxvcmRlcildDQpgYGANCg0KDQpUaGVuIGdvIHRocm91Z2ggYW5kIGNvbWJpbmUgdGhlIHJhbmdlcw0KDQpgYGB7cn0NCnNtYWxsbGlzdDwtbGlzdCgpDQp4PC1ibGFja2xpc3RbWzFdXQ0KZm9yKGkgaW4gMjpsZW5ndGgoYmxhY2tsaXN0KSl7DQp5PC1ibGFja2xpc3RbW2ldXQ0KIyMjIGlmIHRoZSBvbGQgcmFuZ2Ugb3ZlcmxhcHMgdGhlIG5ldyByYW5nZSBvciB0aGUgbmV3IHJhbmdlIGlzIHJpZ2h0IG5leHQgdG8gdGhlIG9sZCByYW5nZSAobm8gZ2FwcykNCiMjIyB0aGVuIGFkZCB0aGUgbmV3IHJhbmdlIHRvIHRoZSBvbGQgcmFuZ2UuIGFuZCBtb3ZlIHRvIHRoZSBuZXh0DQppZih4WzJdPj15WzFdfHx4WzJdKzE9PXlbMV0pe3g8LWMoeFsxXSxtYXgoeFsyXSx5WzJdKSkNCiMjIyBpZiB0aGVyZSBpcyBhIGdhcCwgcHV0IHRoZSBvbGQgcmFuZ2UgaW50byB0aGUgbGlzdCwgbWFrZSB0aGUgbmV3IHJhbmdlIHRoZSBuZXcgb2xkIHJhbmdlLCBhbmQgbW92ZSB0byB0aGUgbmV4dA0KfWVsc2V7DQogIHNtYWxsbGlzdDwtYyhzbWFsbGxpc3QsbGlzdCh4KSkNCiAgeDwteX19DQojIyMgYWRkIHRoZSBmaW5hbCByYW5nZSB0byB0aGUgbGlzdCBvZiByYW5nZXMNCnNtYWxsbGlzdDwtYyhzbWFsbGxpc3QsbGlzdCh4KSkNCmBgYA0KDQpUaGVyZSBhcmUgYSBmZXcgb3RoZXIgd2F5cyB0byBkbyB0aGlzIChmb3IgZXhhbXBsZSwgdGhlIHNtYWxsZXN0IGhhZCB0byBiZSBvbmUgbW9yZSB0aGFuIG9uZSBvZiB0aGUgcmFuZ2VzIC0gdGhhdCBtZWFucyB0aGF0IGl0IHdhcyBwb3NzaWJsZSB0byBqdXN0IGdldCB0aGUgbnVtYmVycyB0aGF0IHdlcmUgdGhlIHVwcGVyIGVuZCBvZiB0aGUgcmFuZ2VzLCBwbHVzIG9uZSwgcnVuIHRoZW0gdG8gc2VlIGlmIGFueSBkaWRuJ3QgZml0IGludG8gb3RoZXIgcmFuZ2VzIGFuZCB0aGUgc21hbGxlc3Qgd291bGQgYmUgcGFydDEuICBCdXQgdGhpcyBtYWtlcyBwYXJ0IDIgdmVyeSBlYXN5LiApDQoNCmBgYHtyfQ0KIyMjIHBhcnQgMSBpcyAxIG1vcmUgdGhhbiB0aGUgZW5kIG9mIHRoZSBzbWFsbGVzdCByYW5nZQ0KcGFydDE8LXNtYWxsbGlzdFtbMV1dWzJdKzENCnBhcnQxDQpgYGANCg0KDQojIyBQYXJ0IDINCkFkZCB1cCB0aGUgZGlzdGFuY2UgYmV0d2VlbiByYW5nZXMuICAoTXkgcmVhbCBpbnB1dCBzdHJldGNoZXMgZnJvbSB0aGUgbG93ZXIgdG8gdXBwZXIgbGltaXQsIHNvIHRoZXJlJ3Mgbm8gcmVhc29uIHRvIGFjY291bnQgZm9yIGl0LiAgQnV0IGRvIHRoYXQgaWYgaXQgZG9lc24ndC4pDQoNCmBgYHtyfQ0KDQpwYXJ0Mjwtc2FwcGx5KDI6bGVuZ3RoKHNtYWxsbGlzdCksZnVuY3Rpb24oaSl7DQogIGdhcDwtc21hbGxsaXN0W1tpXV1bMV0tc21hbGxsaXN0W1tpLTFdXVsyXS0xDQpnYXB9KQ0KDQpwYXJ0Mjwtc3VtKHBhcnQyKQ0KcGFydDINCg0KYGBgDQoNCg==</div>
 
 
 
@@ -1902,7 +1882,7 @@ $(document).ready(function () {
 <!-- code folding -->
 <script>
 $(document).ready(function () {
-  window.initializeSourceEmbed("Day18.Rmd");
+  window.initializeSourceEmbed("Day20.Rmd");
   window.initializeCodeFolding("show" === "show");
 });
 </script>

@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 22 Notebook"
 output: html_notebook
 ---
 
@@ -15,11 +15,52 @@ library(ggraph)
 library(readr)
 library(ds4psy)
 library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
+```{r}
+input<-read_lines("../../AoCData/AOC2016/Day22.txt",skip=2)
+```
+## Part 1 - first prep the data:
+```{r}
+nodes<-list()
+for(i in 1:length(input)){
+  x<-str_replace_all(input[i],"[T%]","")
+  x<-str_replace_all(x,"/dev/grid/node-x"," ")
+  x<-str_replace_all(x,"-y"," ")
+  x<-str_squish(x)
+  x<-as.numeric(unlist(str_split(x," ")))
+  x
+  nodes<-c(nodes,list(x))}
+
+## each vector in nodes will be c(x,y,Size, Used, Avail, Use%)
+```
+
+
+```{r}
+part1<-0
+qq<-c()
+for(i in 1:length(nodes)){
+  for(j in 1:length(nodes)){
+    A<-nodes[[i]]
+    B<-nodes[[j]]
+    if(i!=j&&A[4]!=0&&A[4]<=B[5]){
+      qq<-c(qq,paste0(A[1],",",A[2],"~",B[1],",",B[2]))
+      part1<-part1+1}}}
+part1
+```
+## Part 2
+Part 2 seems to look like it should be able to be done manually, but I seem to be really bad at counting, so BFS it is!
+
+First, just taking a look at the data in heatmap form:
+```{r}
+grdf<-as.data.frame(t(as.data.frame(nodes)))
+colnames(grdf)<-c("x","y","size","used","avail","use%")
+
+ggplot(grdf, aes(x, y, fill= used)) + 
+  geom_tile()+
+  scale_fill_gradient(low="white", high="blue") +
   theme(axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         axis.text.y = element_blank(),
@@ -29,7 +70,129 @@ basicgraph<-ggplot()+
         panel.grid.major = element_blank(),
         panel.grid.minor = element_blank(),
         legend.position="none")+
-  scale_y_reverse+
+  scale_y_reverse()+
   coord_fixed()
 ```
+It looks like an empty square in the lower right quadrant, a bunch of numbers that are pretty close, and a "wall" of high numbers between the empty square and the upper right corner.
+
+So, the "path" is to move the empty square up to the upper right corner (around the wall), then the value in the upper right corner to the upper left corner
+
+So - to get a workable map, transforming this into a matrix, the empty space will be 0, the not empty small spaces will be 100, the wall will be 500 and the goal will be 10.
+
+
+
+```{r}
+grdf$x<-grdf$x+1
+grdf$y<-grdf$y+1
+grdf<-grdf %>% mutate(val=round(used,-2))
+grdf$val[intersect(which(grdf$x==max(grdf$x)),which(grdf$y==1))]<-50
+ggplot(grdf, aes(x, y, fill= val)) + 
+  geom_tile()+
+  scale_fill_gradient(low="white", high="blue") +
+  theme(axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
+        axis.text.y = element_blank(),
+        axis.ticks.y = element_blank(),
+        axis.title.y = element_blank(),
+        axis.title.x = element_blank(),
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        legend.position="none")+
+  scale_y_reverse()+
+  coord_fixed()
+```
+The goal is to get the light purple square in the upper right corner to the upper left corner.
+
+So make this into a matrix
+```{r}
+gr<-matrix(0,ncol=max(grdf$x),nrow=max(grdf$y))
+for(i in 1:nrow(grdf)){
+  gr[grdf$y[i],grdf$x[i]]<-grdf$val[i]}
+```
+
+
+
+A quick function to figure out priority - because it's going to be weird:
+
+```{r}
+gridpri<-function(zx,zy,gx,gy,t){
+  #start with time already used
+  pri<-t
+  # add the distance from the goal square to the top left point
+  pri<-pri+(gx-1)+(gy-1)
+  ### if the goal has moved
+  if(gx==32&&gy==1){
+  ### to make sure that the zero gets around the wall -
+  ### if it's already higher up, distance betwen the zero point and the goal
+    if(zy<=7){pri<-pri+abs(zx-gx)+abs(zy-gy)
+  ### if its below, then distance to the wall edge(7,25)+ distance to the goal
+    }else{pri<-pri+abs(zx-25)+abs(zy-7)+13}}
+pri}
+```
+
+The search itself isn't quite so weird - but just hardcoding in the starting values to make things easier.
+
+
+```{r}
+ grbfs<-function(g=gr){
+   dct<-dict()
+   pq<-priority_queue()
+   pq$push(list(gr,0))
+   while(pq$size()>0){
+     curr<-pq$pop()
+     currg<-curr[[1]]
+     ### if we're done, stop
+     if(currg[1,1]==50){return(curr[[2]])
+       break}
+     ### if we've been here before, next
+     if(dct$has(currg)){next}
+     dct$set(currg,curr[[2]])
+     z<-as.vector(which(currg==0,arr.ind=TRUE))
+     goal<-as.vector(which(currg==50,arr.ind=TRUE))
+     t<-unlist(curr[[2]])
+     ###up
+     if(z[1]>1&&g[(z[1]-1),z[2]]<200){
+       u<-currg
+       u[z[1],z[2]]<-currg[(z[1]-1),z[2]]
+       u[(z[1]-1),z[2]]<-0
+       ug<-as.vector(which(u==50,arr.ind=TRUE))
+       pri<-gridpri(z[2],z[1]-1,ug[2],ug[1],curr[[2]]+1)
+       pq$push(list(u,t+1),priority=-pri)}
+     ###down
+     if(z[1]<30&&g[(z[1]+1),z[2]]<200){
+       d<-currg
+       d[z[1],z[2]]<-currg[(z[1]+1),z[2]]
+       d[(z[1]+1),z[2]]<-0
+       dg<-as.vector(which(d==50,arr.ind=TRUE))
+       pri<-gridpri(z[2],z[1]-1,dg[2],dg[1],curr[[2]]+1)
+       pq$push(list(d,t+1),priority=-pri)}
+     ###left
+     if(z[2]>1&&g[z[1],(z[2]-1)]<200){
+       l<-currg
+       l[z[1],z[2]]<-currg[z[1],(z[2]-1)]
+       l[z[1],(z[2]-1)]<-0
+       lg<-as.vector(which(l==50,arr.ind=TRUE))
+       pri<-gridpri(z[2],z[1]-1,lg[2],lg[1],curr[[2]]+1)
+       pq$push(list(l,t+1),priority=-pri)}
+     ###right
+     if(z[2]<32&&g[z[1],(z[2]+1)]<200){
+       r<-currg
+       r[z[1],z[2]]<-currg[z[1],(z[2]+1)]
+       r[z[1],(z[2]+1)]<-0
+       rg<-as.vector(which(r==50,arr.ind=TRUE))
+       pri<-gridpri(z[2],z[1]+1,rg[2],rg[1],curr[[2]]+1)
+       pq$push(list(r,t+1),priority=-pri)}
+   }
+###
+ list(dct,pq)}
+
+```
+
+
+```{r}
+part2<-grbfs()
+part2
+```
+
+
 

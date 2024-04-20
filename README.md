@@ -23,10 +23,10 @@ Code and notebooks from [Advent of Code 2016](https://adventofcode.com/2016).
 | 16 | *Dragon Checksum* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-16.nb.html) | [Notebook](<Day 16/Day16.Rmd>) | [Files](<Day 16>) |
 | 17 | *Two Steps Forward* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-17.nb.html) | [Notebook](<Day 17/Day17.Rmd>) | [Files](<Day 17>) |
 | 18 | *Like a Rogue*  | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-18.nb.html) | [Notebook](<Day 18/Day18.Rmd>) | [Files](<Day 18>) |
-| 19 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-19.nb.html) | [Notebook](<Day 19/Day19.Rmd>) | [Files](<Day 19>) |
-| 20 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-20.nb.html) | [Notebook](<Day 20/Day20.Rmd>) | [Files](<Day 20>) |
-| 21 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-21.nb.html) | [Notebook](<Day 21/Day21.Rmd>) | [Files](<Day 21>) |
-| 22 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-22.nb.html) | [Notebook](<Day 22/Day22.Rmd>) | [Files](<Day 22>) |
-| 23 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-23.nb.html) | [Notebook](<Day 23/Day23.Rmd>) | [Files](<Day 23>) |
-| 24 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-24.nb.html) | [Notebook](<Day 24/Day24.Rmd>) | [Files](<Day 24>) |
-| 25 |    | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-25.nb.html) | [Notebook](<Day 25/Day25.Rmd>) | [Files](<Day 25>) |
+| 19 | *An Elephant Named Joseph* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-19.nb.html) | [Notebook](<Day 19/Day19.Rmd>) | [Files](<Day 19>) |
+| 20 | *Firewall Rules*  | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-20.nb.html) | [Notebook](<Day 20/Day20.Rmd>) | [Files](<Day 20>) |
+| 21 | *Scrambled Letters and Hash* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-21.nb.html) | [Notebook](<Day 21/Day21.Rmd>) | [Files](<Day 21>) |
+| 22 | *Grid Computing* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-22.nb.html) | [Notebook](<Day 22/Day22.Rmd>) | [Files](<Day 22>) |
+| 23 | *Safe Cracking* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-23.nb.html) | [Notebook](<Day 23/Day23.Rmd>) | [Files](<Day 23>) |
+| 24 | *Air Duct Spelunking* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-24.nb.html) | [Notebook](<Day 24/Day24.Rmd>) | [Files](<Day 24>) |
+| 25 | *Clock Signal* | [HTML](https://exitingbear.github.io/AdventOfCode2016/Day-25.nb.html) | [Notebook](<Day 25/Day25.Rmd>) | [Files](<Day 25>) |

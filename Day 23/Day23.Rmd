@@ -1,5 +1,5 @@
 ---
-title: "Day XX Notebook"
+title: "Day 23 Notebook"
 output: html_notebook
 ---
 
@@ -8,28 +8,95 @@ library(knitr)
 library(dplyr)
 library(stringr)
 library(tidyverse)
-library(igraph)
-library(ggplot2)
-library(rgl)
-library(ggraph)
 library(readr)
-library(ds4psy)
-library(numbers)
+library(collections)
 options(scipen = 999)
 ```
 
-```{r,echo=FALSE}
-basicgraph<-ggplot()+
-  theme(axis.text.x = element_blank(),
-        axis.ticks.x = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.y = element_blank(),
-        axis.title.x = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank(),
-        legend.position="none")+
-  scale_y_reverse+
-  coord_fixed()
+
+
+```{r}
+input<-read_lines("Day23Sample.txt")
 ```
+
+
+### Part 1
+Start with the code from Day 12 and add in toggle - 
+
+```{r}
+togit<-function(ti){
+  ti<-unlist(str_split(ti," "))
+  if(length(ti)==2){
+   if(ti[1]=="inc"){ti[1]<-"dec"}else{ti[1]<-"inc"}
+  }else{
+    if(ti[1]=="jnz"){ti[1]<-"cpy"}else{ti[1]<-"jnz"}}
+  ti<-str_flatten(ti,collapse=" ")
+ti}
+
+```
+
+
+```{r}
+assembunny<-function(instructions=input,a,b,c,d){
+  ### set up registsers
+  r<-dict(list("a"=a,"b"=b,"c"=c,"d"=d))
+  i<-1
+  ### i is the instruction being read stop when out of instructions
+  while(i<=length(instructions)){
+#    cat(instructions[i],"\n")
+    ### break this into pieces in a list
+    inst<-as.list(unlist(str_split(instructions[i]," ")))
+    ### turn numbers into numbers rather than strings
+    for(j in 2:length(inst)){
+      if(str_detect(inst[[j]],"[0-9]")){
+        inst[[j]]<-as.numeric(inst[[j]])
+      }}
+    ### run through the instructions
+    switch(inst[[1]],
+           ### if cpy, put the number in the register
+           "cpy"={if(is.numeric(inst[[2]])){r$set(inst[[3]],inst[[2]])}else{r$set(inst[[3]],r$get(inst[[2]]))}
+             i<-i+1},
+           ### increase the register
+           "inc"={r$set(inst[[2]],r$get(inst[[2]])+1)
+             i<-i+1},
+           ### decrease the register
+           "dec"={r$set(inst[[2]],r$get(inst[[2]])-1)
+             i<-i+1},
+           ### jump if NOT zero (in my input, there is a placeholder instruction,
+           ### so while the second slot is usually a register, it doesn't have to be)
+           "jnz"={
+             if(is.numeric(inst[[3]])){n3<-inst[[3]]}else{n3<-r$get(inst[[3]])}
+             if(is.numeric(inst[[2]])){
+             if(inst[[2]]!=0){i<-i+n3}else{i<-i+1}
+             }else{if(r$get(inst[[2]])!=0){i<-i+n3}else{i<-i+1}}},
+           ###  
+           "tgl"={
+             x<-inst[[2]]
+             if(!is.numeric(x)){x<-r$get(x)}
+             if((i+x)<=length(instructions)){
+               instructions[i+x]<-togit(instructions[i+x])}
+           i<-i+1
+           },
+           cat("something went wrong\n"))}
+  list(r,instructions)}
+```
+
+
+```{r}
+z<-assembunny(input,1,0,0,0)
+part1<-z[[1]]$get("a")
+part1
+```
+## Part 2
+Something is supposed to multiply? Maybe? Not going to even try.
+After breaking it down -
+if eggs is at least 6, the toggle works on lines 19, 21, 23, and 25 (otherwise, there's an infinite loop)
+The first half puts eggs! in a, and the second half adds 91*96.
+
+
+```{r}
+part2<-factorial(12)+91*96
+part2
+```
+
 
